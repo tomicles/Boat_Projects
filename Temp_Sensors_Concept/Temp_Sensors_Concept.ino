@@ -1,4 +1,3 @@
-
 // Connect to Temp/humidity sensors and record data, print to serial
 // Capacitor between GND and Reset to prevent usb connection reset
 
