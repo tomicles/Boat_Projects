@@ -22,8 +22,6 @@
 #define BUTTON2 9           
 #define LIGHTSENSOR A0 //A0 --> 14
 
-#define REFVOLTS = 5.14
-
 SoftwareSerial lcdSerial(10, 11, 1);  //RX, TX, Inverted
 SoftwareSerial segSerial(6, 5);  //RX, TX
 
@@ -35,7 +33,7 @@ SoftwareSerial segSerial(6, 5);  //RX, TX
 ############################################
 */
 
-#define CNT 100
+#define CNT 100  // how many values to save for average
 #define VAR 5  // last,min,max,ave,sum
 
 /* 
@@ -57,21 +55,21 @@ DeviceAddress OneWireW = {
 
 
 // Initialize sensor arrays {sensorvalue, min, max, ave, sum, [readings]}
-float OneWire1_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // OneWire1
-float OneWire2_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // OneWire2
-float OneWire3_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // OneWire3
-float OneWire4_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // OneWire4
-float OneWireW_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // OneWireW
-float AM2302_t[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // AM2302 Temperature
-float AM2302_h[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // AM2302 Humidity
+//float OneWire1_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // OneWire1
+//float OneWire2_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // OneWire2
+//float OneWire3_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // OneWire3
+//float OneWire4_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // OneWire4
+//float OneWireW_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // OneWireW
+//float AM2302_t[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // AM2302 Temperature
+//float AM2302_h[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // AM2302 Humidity
 float i2c_a2_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // i2c Analog Input 2
 float i2c_a3_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // i2c Analog Input 3
 float i2c_a4_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // i2c Analog Input 4
 float i2c_a5_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // i2c Analog Input 5
 
-//int VAREND = VAR-1;  // starting point for where to store data in the array.
+int VAREND = VAR-1;  // starting point for where to store data in the array.
 int first = 1;  // dont calculate average until 1 full set of array data is availabe.
-int current_count = 0;  // starting point for keeping track of CNT on main loop
+int current_count = VAR-1;  // starting point for keeping track of CNT on main loop
 
 /* 
 ############################################
@@ -83,16 +81,11 @@ OneWire oneWire(ONE_WIRE_BUS); // Setup a oneWire instance to communicate with a
 DHT dht(DHTPIN, DHT22); // AM2302 Sensor Connection.  Removed reference to DHT22 and called it directly
 DallasTemperature sensors(&oneWire); // Pass our oneWire reference to Dallas Temperature. 
 
-
-
-
-
 /* 
 ############################################
              Define variables
 ############################################
 */
-
 
 // light sensor to dim lcd screen
 
@@ -100,9 +93,6 @@ float stableLight = 0;
 int lightSensorMax = 0; // lowest value to start
 int lightSensorMin =  1023;  // highest valuse to start
 int clearScreen;  //just needs to be defined for later 
-
-
-
 
 /* 
 ############################################
@@ -127,8 +117,6 @@ void setup(void)
 	// start DHT libarary for AM2302 Sensor
 	dht.begin();
 
-
-
 	// Start Serial ports
 	lcdSerial.begin(9600);
 	Serial.begin(9600);
@@ -142,35 +130,59 @@ void setup(void)
 	delay(1000);
 }
 
-
-
-
-
-
-
 /* 
 ############################################
              Start Main Loop
 ############################################
 */
-
 void loop(void)
 {
-
 	current_count = current_count + 1;
 	if(current_count >= CNT+VAR){
-		current_count=0;
+		current_count=VAR-1;
+		first=0;
 	}
 
 	stableLight = stableLight * 0.98 + analogRead(LIGHTSENSOR) * 0.02;
+
+	//sensors.requestTemperatures();
+	//OneWire1_array[0] = DallasTemperature::toFahrenheit(sensors.getTempC(OneWire1));
+	//OneWire2_array[0] = DallasTemperature::toFahrenheit(sensors.getTempC(OneWire2));
+	//OneWire3_array[0] = DallasTemperature::toFahrenheit(sensors.getTempC(OneWire3));
+	//OneWire4_array[0] = DallasTemperature::toFahrenheit(sensors.getTempC(OneWire4));
+	//OneWireW_array[0] = DallasTemperature::toFahrenheit(sensors.getTempC(OneWireW));
+	//AM2302_t[0] = DallasTemperature::toFahrenheit(dht.readTemperature());
+	//AM2302_h[0] = dht.readHumidity();
+	i2c_a2_array[0] = getAnalogInput(2);
+	i2c_a3_array[0] = getAnalogInput(3);
+	i2c_a4_array[0] = getAnalogInput(4);
+	i2c_a5_array[0] = getAnalogInput(5);
+
+	//setMinMax(OneWire1_array);
+	//setMinMax(OneWire2_array);
+	//setMinMax(OneWire3_array);
+	//setMinMax(OneWire4_array);
+	//setMinMax(OneWireW_array);
+	//setMinMax(AM2302_t);
+	//setMinMax(AM2302_h);
+	setMinMax(i2c_a2_array);
+	setMinMax(i2c_a3_array);
+	setMinMax(i2c_a4_array);
+	setMinMax(i2c_a5_array);
 	
+	//getTemp(OneWire1_array, current_count);
+	//getTemp(OneWire2_array, current_count);
+	//getTemp(OneWire3_array, current_count);
+	//getTemp(OneWire4_array, current_count);
+	//getTemp(OneWireW_array, current_count);
+	//getTemp(AM2302_t, current_count);
+	//getTemp(AM2302_h, current_count);
+	getTemp(i2c_a2_array, current_count);
+	getTemp(i2c_a3_array, current_count);
+	getTemp(i2c_a4_array, current_count);
+	getTemp(i2c_a5_array, current_count);
 
-
-	voltageDividerTest();
-
-	delay(10);
-
-
+	voltageDividerTest(); 
 }
 
 
@@ -193,7 +205,28 @@ void setMinMax(float x[])
 	if (x[0] <= x[1]) { x[1] = x[0]; }
 }
 
-
+/* 
+###########################################################
+    getTemp(array, count)
+Store actual value into array position for current loop iteration
+Calculate and store average
+###########################################################
+*/
+void getTemp(float x[], int count)
+{
+	int sum;
+	x[current_count] = x[0]; // set actual value into array loop position
+	if(count==CNT+VAR-1){   // reset variable after the frist loop is reached
+		first = 0;
+	}
+	if(first==0){	//start calculating average since we have a full set of data
+		x[4]=0;
+		for(sum=5; sum<(CNT+VAR); sum++){
+			x[4] += x[sum];
+		}
+		x[3] = x[4]/CNT;
+	}
+}
 /* 
 ###########################################################
 				setFont(x)
@@ -271,18 +304,18 @@ int getAnalogInput(byte x){  // x is analog channel 0 - 7
   result = word(Adval_High, Adval_Low);
   return result;
 }  
-
-
 /* 
 ###########################################################
-				voltage(x)
+				a2voltage(x)
 		Convert AD output to voltage. 
 ###########################################################
 */
 float voltage(int sensorValue){
  //float result = sensorValue * (4.124 / 4096);
- float result = sensorValue * (5.00 / 4096);
- return result; 
+ //float result = sensorValue * (4.123 / 4096);
+	float sample1 = 4096*(3.054/3040);
+	float result = sensorValue * (sample1 / 4096);
+ 	return result; 
 }
 
 /* 
@@ -295,10 +328,58 @@ float voltageDivider(float voltage, int r1, int r2){
 	//int resistorFactor = 1024;
 	float multiplier = (r1+r2)/r2;
 	float actualVolts = voltage * multiplier;
+	//float actualVolts = voltage * (r2/(r1+r2));
 	return actualVolts;
 
 }
+/* 
+###########################################################
+			voltageRatio(divided_voltage, ratio)
+		Calculate actual voltage from voltage divider
+		Ratio: measured expected voltage / actual voltage
+###########################################################
+*/
+float voltageRatio(float voltage, int input){
+	// input = number
+	if(input==0){  // a0 analog input
+	}
+	if(input==1){  // a1 analog input
+	}
+	if(input==2){  // a2 analog input
+		// 8 volt linear regulator from amp meter board
+		// passes through Voltage Divider R1 = 993ohm, R2 = 657ohm
+		// sample 1 ratio = 7.76/3.09
+		float actualVolts = voltage *(7.76/3.09);
+		return actualVolts;
+	}
+	if(input==3){  // a3 analog input
+		// amp meter board readout
+		// passes through Voltage Divider R1 = 325ohm, R2 = 1029ohm
+		// sample 1 ratio = 3.59/2.708
+		float actualVolts = voltage *(3.59/2.708);
+		return actualVolts;
+	}
+	if(input==4){  // a4 analog input
+		// Raw power input
+		// passes through Voltage Divider R1 = 3213ohm, R2 = 1000ohm
+		// sample 1 ratio = 12.14/2.865
+		float actualVolts = voltage *(12.14/2.865);
+		return actualVolts;
+	}
+	if(input==5){  // a5 analog input
+		// 12v linear regulator output voltage
+		// passes through Voltage Divider R1 = 3224ohm, R2 = 991ohm
+		// sample 1 ratio = 10.64/2.521
+		float actualVolts = voltage *(10.64/2.521);
+		return actualVolts;
+	}
+	if(input==6){  // a6 analog input
+	}
+	if(input==7){  // a7 analog input
+	}
 
+
+}
 
 /* 
 ###########################################################
@@ -307,37 +388,37 @@ Show raw input, voltage calculation, and multiply for vdivider
 ###########################################################
 */
 void voltageDividerTest(void){
-	int a2 = getAnalogInput(2);  // amp meter 8v return divided
-	int a3 = getAnalogInput(3);  // 12v regulator divided
-	int a4 = getAnalogInput(4);  // raw input divided
-	int a5 = getAnalogInput(5);  // amp meter reading divided
-	lcdSerial.write(0x01); // Home
-	lcdSerial.write(0x03);
-	lcdSerial.print(a3);
-	lcdSerial.print(" ");
-	lcdSerial.print(voltage(a3));
-	lcdSerial.print(" ");
-	lcdSerial.print(voltageDivider(voltage(a3),3213, 1000));
-	lcdSerial.write(0x0D); // Carriage Return
-	lcdSerial.print(a4);
-	lcdSerial.print(" ");
-	lcdSerial.print(voltage(a4));
-	lcdSerial.print(" ");
-	lcdSerial.print(voltageDivider(voltage(a4),3224, 991));
-	lcdSerial.write(0x0D); // Carriage Return
-	lcdSerial.print(a5);
-	lcdSerial.print(" ");
-	lcdSerial.print(voltage(a5));
-	lcdSerial.print(" ");
-	lcdSerial.print(voltageDivider(voltage(a5),325, 1029));
-	lcdSerial.write(0x0D); // Carriage Return
-	lcdSerial.print(a2);
-	lcdSerial.print(" ");
-	lcdSerial.print(voltage(a2));
-	lcdSerial.print(" ");
-	lcdSerial.print(voltageDivider(voltage(a2),993, 657));
+	if(first==1){
+		firstLoop();
+	}
+	if(first==0){
+		lcdSerial.write(0x01); // Home
+		lcdSerial.write(0x03);
+		lcdSerial.print(i2c_a2_array[3],0);
+		lcdSerial.print(" ");	
+		lcdSerial.print(voltage(i2c_a2_array[3]),2);
+		lcdSerial.print(" ");
+		lcdSerial.print(voltageRatio(voltage(i2c_a2_array[3]),2));
+			lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print(i2c_a3_array[3],0);
+		lcdSerial.print(" ");	
+		lcdSerial.print(voltage(i2c_a3_array[3]),2);
+		lcdSerial.print(" ");
+		lcdSerial.print(voltageRatio(voltage(i2c_a3_array[3]),3));
+				lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print(i2c_a4_array[3],0);
+		lcdSerial.print(" ");	
+		lcdSerial.print(voltage(i2c_a4_array[3]),2);
+		lcdSerial.print(" ");
+		lcdSerial.print(voltageRatio(voltage(i2c_a4_array[3]),4));
+				lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print(i2c_a5_array[3],0);
+		lcdSerial.print(" ");	
+		lcdSerial.print(voltage(i2c_a5_array[3]),2);
+		lcdSerial.print(" ");
+		lcdSerial.print(voltageRatio(voltage(i2c_a5_array[3]),5));
+	}
 }
-
 /* 
 ###########################################################
 				screenTest()
@@ -418,10 +499,8 @@ void screenTest(void){
 */
 void startupScreen(void){
 	lcdSerial.write(0x0C); //clear screen
+	lcdSerial.write(0x01); // home
 	lcdSerial.write(0x03); // normal font
-	lcdSerial.write(0x01); // home
-	setFont(3);
-	lcdSerial.write(0x01); // home
 	lcdSerial.print("Starting");
 	lcdSerial.write(0x0D); // beginning next line
 	lcdSerial.print("Sailboat");
@@ -430,4 +509,27 @@ void startupScreen(void){
 	delay(5000);
 	lcdSerial.write(0x0C); //clear screen
 	lcdSerial.write(0x01); // home
+}
+
+/* 
+###########################################################
+				firstLoop()
+		Show text while collecting data for first loop
+###########################################################
+*/
+void firstLoop(void){
+	lcdSerial.write(0x01); // home
+	lcdSerial.write(0x03); // normal font
+	lcdSerial.print("gathering data");
+	lcdSerial.write(0x0D); // beginning next line
+	lcdSerial.print("for 1st average");
+	lcdSerial.write(0x0D); // beginning next line
+	lcdSerial.print("computation.");	
+	lcdSerial.write(0x0D); // beginning next line
+	lcdSerial.print("Wait... ");	
+	lcdSerial.print(104-current_count);
+	if(current_count >= CNT+VAR-2){
+		lcdSerial.write(0x0C);
+	}
+
 }
