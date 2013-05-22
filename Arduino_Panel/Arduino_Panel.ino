@@ -26,9 +26,11 @@ SoftwareSerial lcdSerial(10, 11, 1);  //RX, TX, Inverted
 SoftwareSerial segSerial(6, 5);  //RX, TX
 
 
+
+
 /* 
 ############################################
-           Counts for temp sensor
+       Counts for temp sensor
 	   data averaging
 ############################################
 */
@@ -71,6 +73,17 @@ int VAREND = VAR-1;  // starting point for where to store data in the array.
 int first = 1;  // dont calculate average until 1 full set of array data is availabe.
 int current_count = VAR-1;  // starting point for keeping track of CNT on main loop
 
+int button1State;
+int button2State;
+int lastButton1State = LOW;
+
+long lastDebounce1Time = 0;
+long debounce1Delay = 50;
+
+
+int menuItems = 2;
+int menuItem = 0;
+
 /* 
 ############################################
              Call libraries
@@ -80,6 +93,7 @@ int current_count = VAR-1;  // starting point for keeping track of CNT on main l
 OneWire oneWire(ONE_WIRE_BUS); // Setup a oneWire instance to communicate with any OneWire devices
 DHT dht(DHTPIN, DHT22); // AM2302 Sensor Connection.  Removed reference to DHT22 and called it directly
 DallasTemperature sensors(&oneWire); // Pass our oneWire reference to Dallas Temperature. 
+
 
 /* 
 ############################################
@@ -123,10 +137,11 @@ void setup(void)
 	resetScreen();
 	delay(1000);
 	startupScreen();
-	//screenTest();
+	// screenTest();
 
 	// wire library for I2C AD. join i2c bus 
 	Wire.begin();
+
 	delay(1000);
 }
 
@@ -135,6 +150,7 @@ void setup(void)
              Start Main Loop
 ############################################
 */
+
 void loop(void)
 {
 	current_count = current_count + 1;
@@ -182,7 +198,55 @@ void loop(void)
 	getTemp(i2c_a4_array, current_count);
 	getTemp(i2c_a5_array, current_count);
 
-	voltageDividerTest(); 
+
+	// voltageDividerTest(); 
+	// ampTest();
+	// buttonTest();
+
+	button1State = digitalRead(BUTTON1);
+	if(button1State != lastButton1State) //compare increment button state to its last state
+	{
+		if(button1State == LOW)//increment button is pressed
+			{
+				menuItem = menuItem + 1; //increment the counter
+				lcdSerial.write(0x0C); //clear screen
+				lcdSerial.write(0x01); // home
+				if (menuItem > menuItems){
+					menuItem = 0;
+				}
+			}
+		}
+	lastButton1State = button1State;
+
+	// if (button1State == HIGH) {  
+	// 	menuItem = menuItem + 1;
+	// 	delay(20);
+	// 	if (menuItem > menuItems){
+	// 		menuItem = 0;
+	// 	}
+	// } 
+
+
+	switch (menuItem){
+		case 0:
+			voltageDividerTest();
+			// lcdSerial.write(0x01);  // Home cursor
+			// lcdSerial.write(0x03);  // normal font
+			// lcdSerial.print("Case 0");
+			break;
+		case 1:
+			ampTest();
+			// lcdSerial.write(0x01);  // Home cursor
+			// lcdSerial.write(0x03);  // normal font
+			// lcdSerial.print("Case 1");
+			break;
+		case 2:
+			//screenTest();
+			lcdSerial.write(0x01);  // Home cursor
+			lcdSerial.write(0x03);  // normal font
+			lcdSerial.print("Case 2");
+			break;
+	}
 }
 
 
@@ -193,10 +257,46 @@ void loop(void)
 ############################################
 */
 
+
+/* 
+###########################################################
+    gpsTest(void)
+    GPS
+###########################################################
+*/
+// void gpsTest(void){
+// 	lcdSerial.write(0x01); // Home
+// 	lcdSerial.write(0x03);
+// 	lcdSerial.print("Fix: ");
+// 	lcdSerial.print((int)GPS.fix);
+// 	lcdSerial.write(0x0D); // Carriage Return
+// 	lcdSerial.print(" quality: ");
+// 	lcdSerial.print((int)GPS.fixquality);
+// 	if (GPS.fix) {
+// 		lcdSerial.write(0x01); // Home
+// 		lcdSerial.write(0x03);
+// 		//lcdSerial.print("Location: ");
+// 		//lcdSerial.print(GPS.latitude, 4); lcdSerial.print(GPS.lat);
+// 		//lcdSerial.print(", "); 
+// 		//lcdSerial.print(GPS.longitude, 4); 
+// 		//lcdSerial.print(GPS.lon);
+// 		lcdSerial.print("Speed (knots): "); lcdSerial.print(GPS.speed);
+// 		lcdSerial.write(0x0D); // Carriage Return
+// 		lcdSerial.print("Angle: "); lcdSerial.print(GPS.angle);
+// 		lcdSerial.write(0x0D); // Carriage Return
+// 		lcdSerial.print("Altitude: "); lcdSerial.print(GPS.altitude);
+// 		lcdSerial.write(0x0D); // Carriage Return
+// 		lcdSerial.print("Satellites: "); lcdSerial.print((int)GPS.satellites);
+// 	}
+
+// }
 /* 
 ###########################################################
     setMinMax(OneWire1_array)
     Store min or max value from array into same array
+    array[0] current value
+    array[1] min
+    array[2] max
 ###########################################################
 */
 void setMinMax(float x[])
@@ -236,7 +336,8 @@ where x is 1 = 4x16, 2 = 2x16, 3=4x8, 4=2x8, 5=1x8, 6=1x4
 int setFont(int x){
   lcdSerial.write(0x03); // set font back to normal
   for (int i = 1; i < x; i++){
-   lcdSerial.write(0x02); // Set font size one step larger (4x16->2x16->4x8->2x8->1x8->1x4)
+   lcdSerial.write(0x02); // Set font size one step larger 
+   						  // (4x16->2x16->4x8->2x8->1x8->1x4)
    delay(10);
   }
 }
@@ -248,12 +349,9 @@ int setFont(int x){
 ###########################################################
 */
 void resetScreen(void){
-    if (clearScreen == 1){ // only clear screen if first time through loop. 
-    	lcdSerial.write(0x0C); // clear screen
-      	clearScreen = 0;
-    }
     lcdSerial.write(0x03); // set font back to normal
     lcdSerial.write(0x01); // Home
+    lcdSerial.write(0x0C); // clear screen
 }
 
 /* 
@@ -271,8 +369,6 @@ void dimScreen(int x){
       lcdSerial.write(0x0E); // Display Driver On
     }
 }
-
-
 
 
 /* 
@@ -304,9 +400,23 @@ int getAnalogInput(byte x){  // x is analog channel 0 - 7
   result = word(Adval_High, Adval_Low);
   return result;
 }  
+
 /* 
 ###########################################################
-				a2voltage(x)
+				amps(x)
+		Convert voltage to amps from amp meter
+###########################################################
+*/
+// float amps(float volts){
+// 	float vPerAmp = 0.033;
+// 	float zero = 
+
+// }
+
+
+/* 
+###########################################################
+				voltage(x)
 		Convert AD output to voltage. 
 ###########################################################
 */
@@ -320,23 +430,9 @@ float voltage(int sensorValue){
 
 /* 
 ###########################################################
-			voltageDivider(divided_voltage, r1, r2)
+			voltageRatio(divided_voltage, input)
 		Calculate actual voltage from voltage divider
-###########################################################
-*/
-float voltageDivider(float voltage, int r1, int r2){
-	//int resistorFactor = 1024;
-	float multiplier = (r1+r2)/r2;
-	float actualVolts = voltage * multiplier;
-	//float actualVolts = voltage * (r2/(r1+r2));
-	return actualVolts;
-
-}
-/* 
-###########################################################
-			voltageRatio(divided_voltage, ratio)
-		Calculate actual voltage from voltage divider
-		Ratio: measured expected voltage / actual voltage
+		input = 0-7 for I2C-ADC Input channel 0-7
 ###########################################################
 */
 float voltageRatio(float voltage, int input){
@@ -349,42 +445,82 @@ float voltageRatio(float voltage, int input){
 		// 8 volt linear regulator from amp meter board
 		// passes through Voltage Divider R1 = 993ohm, R2 = 657ohm
 		// sample 1 ratio = 7.76/3.09
-		float actualVolts = voltage *(7.76/3.09);
+		float actualVolts = voltage *(7.76/3.09);  // measured
 		return actualVolts;
 	}
 	if(input==3){  // a3 analog input
 		// amp meter board readout
 		// passes through Voltage Divider R1 = 325ohm, R2 = 1029ohm
 		// sample 1 ratio = 3.59/2.708
-		float actualVolts = voltage *(3.59/2.708);
+		float actualVolts = voltage *(3.59/2.708);  // measured
 		return actualVolts;
 	}
 	if(input==4){  // a4 analog input
 		// Raw power input
 		// passes through Voltage Divider R1 = 3213ohm, R2 = 1000ohm
 		// sample 1 ratio = 12.14/2.865
-		float actualVolts = voltage *(12.14/2.865);
+		float actualVolts = voltage *(12.14/2.865);  // measured
 		return actualVolts;
 	}
 	if(input==5){  // a5 analog input
 		// 12v linear regulator output voltage
 		// passes through Voltage Divider R1 = 3224ohm, R2 = 991ohm
 		// sample 1 ratio = 10.64/2.521
-		float actualVolts = voltage *(10.64/2.521);
+		float actualVolts = voltage *(10.64/2.521);  // measured
 		return actualVolts;
 	}
 	if(input==6){  // a6 analog input
 	}
 	if(input==7){  // a7 analog input
 	}
+}
 
+/* 
+###########################################################
+				ampTest()  NOT WORKING YET
+Show power input, power output, difference, amps
+		| input : 7.60      |
+		| output: 3.47      |
+		| diff  : 4.13      |
+		| amps  : 0.00      |
+###########################################################
+*/
+void ampTest(void){
+	if(first==1){
+		firstLoop();
+	}
+	if(first==0){
+		float input = voltageRatio(voltage(i2c_a2_array[3]),2);
+		float output = voltageRatio(voltage(i2c_a3_array[3]),3);
+		float half = input/2;
+		float diff = half - output; 
+		float current = (output - (half+0.2)) / 0.033;
+		lcdSerial.write(0x01); // Home
+		lcdSerial.write(0x03);
+		lcdSerial.print("input : ");
+		lcdSerial.print(input);
+		lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print("output: ");
+		lcdSerial.print(output);
+		lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print("half   : ");
+		lcdSerial.print(half);
+		lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print("current: ");
+		lcdSerial.print(current);
 
+		//Current = ((analogRead(1)*(5.00/1024))- 2.5)/ .017;
+	}
 }
 
 /* 
 ###########################################################
 				voltageDividerTest()
 Show raw input, voltage calculation, and multiply for vdivider
+		| 3001 3.01 7.57   |
+		| 2589 2.60 3.45   |
+		| 2842 2.86 12.10  |
+		| 2507 2.52 10.63  |
 ###########################################################
 */
 void voltageDividerTest(void){
@@ -419,10 +555,54 @@ void voltageDividerTest(void){
 		lcdSerial.print(voltageRatio(voltage(i2c_a5_array[3]),5));
 	}
 }
+
 /* 
 ###########################################################
+				buttonTest()
+Show button1 and button2 press state
+###########################################################
+*/
+void buttonTest(void){
+	//lcdSerial.write(0x0C);
+	//delay(500);
+	lcdSerial.write(0x01);  // Home cursor
+	lcdSerial.write(0x03);  // normal font
+	lcdSerial.print("Button Test");
+	// read the state of the pushbutton value:
+	button1State = digitalRead(BUTTON1);
+	button2State = digitalRead(BUTTON2);
+	//button2State = digitalRead(BUTTON2);
+
+	// check if the pushbutton is pressed.
+	// if it is, the buttonState is HIGH:
+	if (button1State == HIGH) {   
+		lcdSerial.write(0x0C);
+		lcdSerial.write(0x0D); // beginning next line)
+		lcdSerial.print("Button 1 pressed");
+	} 
+	else {
+		lcdSerial.write(0x01);  // Home cursor
+		lcdSerial.write(0x03);  // normal font
+		lcdSerial.print("Button Test");
+	}
+	if (button2State == HIGH) {
+		lcdSerial.write(0x0C);
+		lcdSerial.write(0x0D); // beginning next line)
+		lcdSerial.print("Button 2 pressed");
+	}
+	else {
+		lcdSerial.write(0x01);  // Home cursor
+		lcdSerial.write(0x03);  // normal font
+		lcdSerial.print("Button Test");
+	}
+
+	//lcdSerial.print("Button1: ")
+}
+
+/*
+###########################################################
 				screenTest()
-Show all fonts and fill the screen in each mode
+Show all fonts and fills the screen in each mode
 ###########################################################
 */
 void screenTest(void){
@@ -506,7 +686,7 @@ void startupScreen(void){
 	lcdSerial.print("Sailboat");
 	lcdSerial.write(0x0D); // beginning next line
 	lcdSerial.print("  9000  ");	
-	delay(5000);
+	delay(2000);
 	lcdSerial.write(0x0C); //clear screen
 	lcdSerial.write(0x01); // home
 }
