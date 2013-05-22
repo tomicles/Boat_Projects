@@ -35,7 +35,7 @@ SoftwareSerial segSerial(6, 5);  //RX, TX
 ############################################
 */
 
-#define CNT 100  // how many values to save for average
+#define CNT 30  // how many values to save for average
 #define VAR 5  // last,min,max,ave,sum
 
 /* 
@@ -57,13 +57,13 @@ DeviceAddress OneWireW = {
 
 
 // Initialize sensor arrays {sensorvalue, min, max, ave, sum, [readings]}
-//float OneWire1_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // OneWire1
-//float OneWire2_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // OneWire2
-//float OneWire3_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // OneWire3
-//float OneWire4_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // OneWire4
-//float OneWireW_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // OneWireW
-//float AM2302_t[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // AM2302 Temperature
-//float AM2302_h[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // AM2302 Humidity
+float OneWire1_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // OneWire1
+float OneWire2_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // OneWire2
+float OneWire3_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // OneWire3
+float OneWire4_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // OneWire4
+float OneWireW_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // OneWireW
+float AM2302_t[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // AM2302 Temperature
+float AM2302_h[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // AM2302 Humidity
 float i2c_a2_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // i2c Analog Input 2
 float i2c_a3_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // i2c Analog Input 3
 float i2c_a4_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // i2c Analog Input 4
@@ -76,10 +76,6 @@ int current_count = VAR-1;  // starting point for keeping track of CNT on main l
 int button1State;
 int button2State;
 int lastButton1State = LOW;
-
-long lastDebounce1Time = 0;
-long debounce1Delay = 50;
-
 
 int menuItems = 2;
 int menuItem = 0;
@@ -156,43 +152,43 @@ void loop(void)
 	current_count = current_count + 1;
 	if(current_count >= CNT+VAR){
 		current_count=VAR-1;
-		first=0;
+		first = 0;
 	}
 
 	stableLight = stableLight * 0.98 + analogRead(LIGHTSENSOR) * 0.02;
 
-	//sensors.requestTemperatures();
-	//OneWire1_array[0] = DallasTemperature::toFahrenheit(sensors.getTempC(OneWire1));
-	//OneWire2_array[0] = DallasTemperature::toFahrenheit(sensors.getTempC(OneWire2));
-	//OneWire3_array[0] = DallasTemperature::toFahrenheit(sensors.getTempC(OneWire3));
-	//OneWire4_array[0] = DallasTemperature::toFahrenheit(sensors.getTempC(OneWire4));
-	//OneWireW_array[0] = DallasTemperature::toFahrenheit(sensors.getTempC(OneWireW));
-	//AM2302_t[0] = DallasTemperature::toFahrenheit(dht.readTemperature());
-	//AM2302_h[0] = dht.readHumidity();
+	sensors.requestTemperatures();
+	OneWire1_array[0] = DallasTemperature::toFahrenheit(sensors.getTempC(OneWire1));
+	OneWire2_array[0] = DallasTemperature::toFahrenheit(sensors.getTempC(OneWire2));
+	OneWire3_array[0] = DallasTemperature::toFahrenheit(sensors.getTempC(OneWire3));
+	OneWire4_array[0] = DallasTemperature::toFahrenheit(sensors.getTempC(OneWire4));
+	OneWireW_array[0] = DallasTemperature::toFahrenheit(sensors.getTempC(OneWireW));
+	// AM2302_t[0] = DallasTemperature::toFahrenheit(dht.readTemperature());
+	// AM2302_h[0] = dht.readHumidity();
 	i2c_a2_array[0] = getAnalogInput(2);
 	i2c_a3_array[0] = getAnalogInput(3);
 	i2c_a4_array[0] = getAnalogInput(4);
 	i2c_a5_array[0] = getAnalogInput(5);
 
-	//setMinMax(OneWire1_array);
-	//setMinMax(OneWire2_array);
-	//setMinMax(OneWire3_array);
-	//setMinMax(OneWire4_array);
-	//setMinMax(OneWireW_array);
-	//setMinMax(AM2302_t);
-	//setMinMax(AM2302_h);
+	setMinMax(OneWire1_array);
+	setMinMax(OneWire2_array);
+	setMinMax(OneWire3_array);
+	setMinMax(OneWire4_array);
+	setMinMax(OneWireW_array);
+	// setMinMax(AM2302_t);
+	// setMinMax(AM2302_h);
 	setMinMax(i2c_a2_array);
 	setMinMax(i2c_a3_array);
 	setMinMax(i2c_a4_array);
 	setMinMax(i2c_a5_array);
 	
-	//getTemp(OneWire1_array, current_count);
-	//getTemp(OneWire2_array, current_count);
-	//getTemp(OneWire3_array, current_count);
-	//getTemp(OneWire4_array, current_count);
-	//getTemp(OneWireW_array, current_count);
-	//getTemp(AM2302_t, current_count);
-	//getTemp(AM2302_h, current_count);
+	getTemp(OneWire1_array, current_count);
+	getTemp(OneWire2_array, current_count);
+	getTemp(OneWire3_array, current_count);
+	getTemp(OneWire4_array, current_count);
+	getTemp(OneWireW_array, current_count);
+	// getTemp(AM2302_t, current_count);
+	// getTemp(AM2302_h, current_count);
 	getTemp(i2c_a2_array, current_count);
 	getTemp(i2c_a3_array, current_count);
 	getTemp(i2c_a4_array, current_count);
@@ -218,33 +214,17 @@ void loop(void)
 		}
 	lastButton1State = button1State;
 
-	// if (button1State == HIGH) {  
-	// 	menuItem = menuItem + 1;
-	// 	delay(20);
-	// 	if (menuItem > menuItems){
-	// 		menuItem = 0;
-	// 	}
-	// } 
 
 
 	switch (menuItem){
 		case 0:
-			voltageDividerTest();
-			// lcdSerial.write(0x01);  // Home cursor
-			// lcdSerial.write(0x03);  // normal font
-			// lcdSerial.print("Case 0");
+			voltageScreen();
 			break;
 		case 1:
-			ampTest();
-			// lcdSerial.write(0x01);  // Home cursor
-			// lcdSerial.write(0x03);  // normal font
-			// lcdSerial.print("Case 1");
+			tempScreen1();
 			break;
 		case 2:
-			//screenTest();
-			lcdSerial.write(0x01);  // Home cursor
-			lcdSerial.write(0x03);  // normal font
-			lcdSerial.print("Case 2");
+			tempScreen2();
 			break;
 	}
 }
@@ -258,38 +238,6 @@ void loop(void)
 */
 
 
-/* 
-###########################################################
-    gpsTest(void)
-    GPS
-###########################################################
-*/
-// void gpsTest(void){
-// 	lcdSerial.write(0x01); // Home
-// 	lcdSerial.write(0x03);
-// 	lcdSerial.print("Fix: ");
-// 	lcdSerial.print((int)GPS.fix);
-// 	lcdSerial.write(0x0D); // Carriage Return
-// 	lcdSerial.print(" quality: ");
-// 	lcdSerial.print((int)GPS.fixquality);
-// 	if (GPS.fix) {
-// 		lcdSerial.write(0x01); // Home
-// 		lcdSerial.write(0x03);
-// 		//lcdSerial.print("Location: ");
-// 		//lcdSerial.print(GPS.latitude, 4); lcdSerial.print(GPS.lat);
-// 		//lcdSerial.print(", "); 
-// 		//lcdSerial.print(GPS.longitude, 4); 
-// 		//lcdSerial.print(GPS.lon);
-// 		lcdSerial.print("Speed (knots): "); lcdSerial.print(GPS.speed);
-// 		lcdSerial.write(0x0D); // Carriage Return
-// 		lcdSerial.print("Angle: "); lcdSerial.print(GPS.angle);
-// 		lcdSerial.write(0x0D); // Carriage Return
-// 		lcdSerial.print("Altitude: "); lcdSerial.print(GPS.altitude);
-// 		lcdSerial.write(0x0D); // Carriage Return
-// 		lcdSerial.print("Satellites: "); lcdSerial.print((int)GPS.satellites);
-// 	}
-
-// }
 /* 
 ###########################################################
     setMinMax(OneWire1_array)
@@ -475,6 +423,104 @@ float voltageRatio(float voltage, int input){
 	}
 }
 
+
+/* 
+###########################################################
+				voltageScreen()
+Show raw input, voltage calculation, and multiply for vdivider
+		| System Power      |
+		| Battery:   12.45  |  
+		| 12v reg:   10.83  |  
+		| Amps   :    7.28  |  
+###########################################################
+*/
+void voltageScreen(void){
+	if(first==1){
+		firstLoop();
+	}
+	if(first==0){
+		lcdSerial.write(0x01); // Home
+		lcdSerial.write(0x03);
+		lcdSerial.print("System Power");
+		lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print("Battery:  ");
+		//lcdSerial.write(0x12); //right align
+		//lcdSerial.write('5'); // number of right align digits
+		float battery = voltageRatio(voltage(i2c_a4_array[3]),4);
+		lcdSerial.print(battery); //Battery
+		lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print("12v Reg:  ");
+		float twelvevReg = voltageRatio(voltage(i2c_a5_array[3]),5);
+		lcdSerial.print(twelvevReg);
+		lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print("Amps   :    ");
+		float input = voltageRatio(voltage(i2c_a2_array[3]),2);
+		float output = voltageRatio(voltage(i2c_a3_array[3]),3);
+		float half = input/2;
+		float current = (output - half) / 0.033;
+		lcdSerial.write(0x12); // ctrl-R right-align the data, erasing unused digits
+    	lcdSerial.write('4'); // # digits
+		lcdSerial.print(current);
+	}
+}
+
+/* 
+###########################################################
+				tempScreen2()
+			Show raw temperatures
+		| Temperatures    |
+		| Circuit: 12.45  |  
+		| Inside2: 10.83  |  
+		| 				  |  
+###########################################################
+*/
+void tempScreen2(void){
+	if(first==1){
+		firstLoop();
+	}
+	if(first==0){
+		lcdSerial.write(0x01); // Home
+		lcdSerial.write(0x03);
+		lcdSerial.print("Temperatures");
+		lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print("Circuit: ");
+		lcdSerial.print(OneWire1_array[3]);
+		lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print("Inside2: ");
+		lcdSerial.print(OneWire4_array[3]);
+	}
+}
+
+/* 
+###########################################################
+				tempScreen2()
+			Show raw temperatures
+		| Temperatures    |
+		| Water  : 12.45  |  
+		| Outside: 10.83  |  
+		| Inside : 7.28   |  
+###########################################################
+*/
+void tempScreen1(void){
+	if(first==1){
+		firstLoop();
+	}
+	if(first==0){
+		lcdSerial.write(0x01); // Home
+		lcdSerial.write(0x03);
+		lcdSerial.print("Temperatures");
+		lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print("Water  : ");
+		lcdSerial.print(OneWireW_array[3]);
+		lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print("Outside: ");
+		lcdSerial.print(OneWire2_array[3]);
+		lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print("Inside : ");
+		lcdSerial.print(OneWire3_array[3]);
+
+	}
+}
 /* 
 ###########################################################
 				ampTest()  NOT WORKING YET
@@ -494,7 +540,9 @@ void ampTest(void){
 		float output = voltageRatio(voltage(i2c_a3_array[3]),3);
 		float half = input/2;
 		float diff = half - output; 
-		float current = (output - (half+0.2)) / 0.033;
+		//float current = (output - (half+0.2)) / 0.033;
+		float current = (output - half) / 0.033;
+
 		lcdSerial.write(0x01); // Home
 		lcdSerial.write(0x03);
 		lcdSerial.print("input : ");
@@ -683,10 +731,10 @@ void startupScreen(void){
 	lcdSerial.write(0x03); // normal font
 	lcdSerial.print("Starting");
 	lcdSerial.write(0x0D); // beginning next line
-	lcdSerial.print("Sailboat");
+	lcdSerial.print("Santana 2023c");
 	lcdSerial.write(0x0D); // beginning next line
-	lcdSerial.print("  9000  ");	
-	delay(2000);
+	lcdSerial.print("Sensor Arrays");	
+	delay(5000);
 	lcdSerial.write(0x0C); //clear screen
 	lcdSerial.write(0x01); // home
 }
@@ -706,10 +754,11 @@ void firstLoop(void){
 	lcdSerial.write(0x0D); // beginning next line
 	lcdSerial.print("computation.");	
 	lcdSerial.write(0x0D); // beginning next line
-	lcdSerial.print("Wait... ");	
-	lcdSerial.print(104-current_count);
+	lcdSerial.print("Wait...    ");	
+	lcdSerial.write(0x12); // ctrl-R right-align the data, erasing unused digits
+    lcdSerial.write('3'); // # digits
+	lcdSerial.print((CNT+VAR)-current_count);
 	if(current_count >= CNT+VAR-2){
 		lcdSerial.write(0x0C);
 	}
-
 }
