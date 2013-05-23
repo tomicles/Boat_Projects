@@ -77,7 +77,7 @@ int button1State;
 int button2State;
 int lastButton1State = LOW;
 
-int menuItems = 2;
+int menuItems = 5;
 int menuItem = 0;
 
 /* 
@@ -200,22 +200,20 @@ void loop(void)
 	// buttonTest();
 
 	button1State = digitalRead(BUTTON1);
-	if(button1State != lastButton1State) //compare increment button state to its last state
-	{
-		if(button1State == LOW)//increment button is pressed
-			{
-				menuItem = menuItem + 1; //increment the counter
-				lcdSerial.write(0x0C); //clear screen
-				lcdSerial.write(0x01); // home
-				if (menuItem > menuItems){
-					menuItem = 0;
-				}
+	if(button1State != lastButton1State){ //compare increment button state to its last state
+		if(button1State == LOW){ //increment button is pressed
+			menuItem = menuItem + 1; //increment the counter
+			lcdSerial.write(0x0C); //clear screen
+			lcdSerial.write(0x01); // home
+			if (menuItem > menuItems){
+				menuItem = 0;
 			}
 		}
+	}
 	lastButton1State = button1State;
 
 
-
+	// cycle through screens from button  press
 	switch (menuItem){
 		case 0:
 			voltageScreen();
@@ -225,6 +223,15 @@ void loop(void)
 			break;
 		case 2:
 			tempScreen2();
+			break;
+		case 3:
+			waterTempDetail();
+			break;
+		case 4:
+			arduinoTempDetail();
+			break;
+		case 5:
+			insideTempDetail();
 			break;
 	}
 }
@@ -247,8 +254,7 @@ void loop(void)
     array[2] max
 ###########################################################
 */
-void setMinMax(float x[])
-{
+void setMinMax(float x[]){
 	if (x[0] >= x[2]) { x[2] = x[0]; }
 	if (x[0] <= x[1]) { x[1] = x[0]; }
 }
@@ -260,8 +266,7 @@ Store actual value into array position for current loop iteration
 Calculate and store average
 ###########################################################
 */
-void getTemp(float x[], int count)
-{
+void getTemp(float x[], int count){
 	int sum;
 	x[current_count] = x[0]; // set actual value into array loop position
 	if(count==CNT+VAR-1){   // reset variable after the frist loop is reached
@@ -282,12 +287,12 @@ where x is 1 = 4x16, 2 = 2x16, 3=4x8, 4=2x8, 5=1x8, 6=1x4
 ###########################################################
 */
 int setFont(int x){
-  lcdSerial.write(0x03); // set font back to normal
-  for (int i = 1; i < x; i++){
-   lcdSerial.write(0x02); // Set font size one step larger 
-   						  // (4x16->2x16->4x8->2x8->1x8->1x4)
-   delay(10);
-  }
+	lcdSerial.write(0x03); // set font back to normal
+	for (int i = 1; i < x; i++){
+		lcdSerial.write(0x02); // Set font size one step larger 
+						  // (4x16->2x16->4x8->2x8->1x8->1x4)
+		delay(10);
+	}
 }
 
 /* 
@@ -309,13 +314,13 @@ void resetScreen(void){
 ###########################################################
 */
 void dimScreen(int x){
-    // offset by 10 to stop brightness jitter
-    if (stableLight < (x - 5)) {
-      lcdSerial.write(0x0F); // Display Driver Off
-    }
-    if (stableLight > (x + 5)) {
-      lcdSerial.write(0x0E); // Display Driver On
-    }
+	// offset by 10 to stop brightness jitter
+	if (stableLight < (x - 5)) {
+		lcdSerial.write(0x0F); // Display Driver Off
+	}
+	if (stableLight > (x + 5)) {
+		lcdSerial.write(0x0E); // Display Driver On
+	}
 }
 
 
@@ -326,40 +331,26 @@ void dimScreen(int x){
 ###########################################################
 */
 int getAnalogInput(byte x){  // x is analog channel 0 - 7
-  int result;
-  const int I2C_address = 0x48;  // I2C write address
-  const byte DAT[8] = {
-    0x8C,0xCC,0x9C,0xDC,0xAC,0xEC,0xBC,0xFC    };
-  // Constant configuration data
-  int loWord;
-  byte Adval_High, Adval_Low;    // Store A/D value (high byte, low byte)
+	int result;
+	const int I2C_address = 0x48;  // I2C write address
+	const byte DAT[8] = { 0x8C,0xCC,0x9C,0xDC,0xAC,0xEC,0xBC,0xFC };
+	// Constant configuration data
+	int loWord;
+	byte Adval_High, Adval_Low;    // Store A/D value (high byte, low byte)
 
-  Wire.beginTransmission(I2C_address);
-  Wire.write(DAT[x]);        // Configure the device to read each CH
-  Wire.endTransmission();
-  delay(1);
-  // Read A/D value
-  Wire.requestFrom(I2C_address, 2);
-  while(Wire.available())          // Checkf for data from slave
-  {
-    Adval_High = Wire.read();   // Receive A/D high byte
-    Adval_Low = Wire.read();    // Receive A/D low byte
-  }
-  result = word(Adval_High, Adval_Low);
-  return result;
+	Wire.beginTransmission(I2C_address);
+	Wire.write(DAT[x]);        // Configure the device to read each CH
+	Wire.endTransmission();
+	delay(1);
+	// Read A/D value
+	Wire.requestFrom(I2C_address, 2);
+	while(Wire.available()){          // Checkf for data from slave
+		Adval_High = Wire.read();   // Receive A/D high byte
+		Adval_Low = Wire.read();    // Receive A/D low byte
+	}
+	result = word(Adval_High, Adval_Low);
+	return result;
 }  
-
-/* 
-###########################################################
-				amps(x)
-		Convert voltage to amps from amp meter
-###########################################################
-*/
-// float amps(float volts){
-// 	float vPerAmp = 0.033;
-// 	float zero = 
-
-// }
 
 
 /* 
@@ -369,11 +360,9 @@ int getAnalogInput(byte x){  // x is analog channel 0 - 7
 ###########################################################
 */
 float voltage(int sensorValue){
- //float result = sensorValue * (4.124 / 4096);
- //float result = sensorValue * (4.123 / 4096);
 	float sample1 = 4096*(3.054/3040);
 	float result = sensorValue * (sample1 / 4096);
- 	return result; 
+	return result; 
 }
 
 /* 
@@ -459,8 +448,41 @@ void voltageScreen(void){
 		float half = input/2;
 		float current = (output - half) / 0.033;
 		lcdSerial.write(0x12); // ctrl-R right-align the data, erasing unused digits
-    	lcdSerial.write('4'); // # digits
+		lcdSerial.write('4'); // # digits
 		lcdSerial.print(current);
+	}
+}
+
+
+
+/* 
+###########################################################
+				tempScreen1()
+			Show raw temperatures
+		| Temperatures    |
+		| Water  : 12.45  |  
+		| Outside: 10.83  |  
+		| Inside : 7.28   |  
+###########################################################
+*/
+void tempScreen1(void){
+	if(first==1){
+		firstLoop();
+	}
+	if(first==0){
+		lcdSerial.write(0x01); // Home
+		lcdSerial.write(0x03);
+		lcdSerial.print("Temperatures");
+		lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print("Water  : ");
+		lcdSerial.print(OneWireW_array[3]);
+		lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print("Outside: ");
+		lcdSerial.print(OneWire2_array[3]);
+		lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print("Inside : ");
+		lcdSerial.print(OneWire3_array[3]);
+
 	}
 }
 
@@ -493,231 +515,95 @@ void tempScreen2(void){
 
 /* 
 ###########################################################
-				tempScreen2()
+			waterTempDetail()
 			Show raw temperatures
-		| Temperatures    |
-		| Water  : 12.45  |  
-		| Outside: 10.83  |  
-		| Inside : 7.28   |  
+		| Temperatures      |
+		| Water Min: 12.45  |  
+		| Water Max: 10.83  |  
+		| Water Ave: 12.15	|  
 ###########################################################
 */
-void tempScreen1(void){
+void waterTempDetail(void){
 	if(first==1){
 		firstLoop();
 	}
 	if(first==0){
 		lcdSerial.write(0x01); // Home
 		lcdSerial.write(0x03);
-		lcdSerial.print("Temperatures");
+		lcdSerial.print("Water Temps");
 		lcdSerial.write(0x0D); // Carriage Return
-		lcdSerial.print("Water  : ");
+		lcdSerial.print("Min: ");
+		lcdSerial.print(OneWireW_array[1]);
+		lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print("Max: ");
+		lcdSerial.print(OneWireW_array[2]);
+		lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print("Ave: ");
 		lcdSerial.print(OneWireW_array[3]);
+	}
+}
+
+/* 
+###########################################################
+			arduinoTempDetail()
+			Show raw temperatures
+		| Temperatures      |
+		| Water Min: 12.45  |  
+		| Water Max: 10.83  |  
+		| Water Ave: 12.15	|  
+###########################################################
+*/
+void arduinoTempDetail(void){
+	if(first==1){
+		firstLoop();
+	}
+	if(first==0){
+		lcdSerial.write(0x01); // Home
+		lcdSerial.write(0x03);
+		lcdSerial.print("Arduino Temps");
 		lcdSerial.write(0x0D); // Carriage Return
-		lcdSerial.print("Outside: ");
-		lcdSerial.print(OneWire2_array[3]);
+		lcdSerial.print("Min: ");
+		lcdSerial.print(OneWire1_array[1]);
 		lcdSerial.write(0x0D); // Carriage Return
-		lcdSerial.print("Inside : ");
+		lcdSerial.print("Max: ");
+		lcdSerial.print(OneWire1_array[2]);
+		lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print("Ave: ");
+		lcdSerial.print(OneWire1_array[3]);
+	}
+}
+/* 
+###########################################################
+			insideTempDetail()
+			Show raw temperatures
+		| Temperatures      |
+		| Water Min: 12.45  |  
+		| Water Max: 10.83  |  
+		| Water Ave: 12.15	|  
+###########################################################
+*/
+void insideTempDetail(void){
+	if(first==1){
+		firstLoop();
+	}
+	if(first==0){
+		lcdSerial.write(0x01); // Home
+		lcdSerial.write(0x03);
+		lcdSerial.print("Inside Temps");
+		lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print("Min: ");
+		lcdSerial.print(OneWire3_array[1]);
+		lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print("Max: ");
+		lcdSerial.print(OneWire3_array[2]);
+		lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print("Ave: ");
 		lcdSerial.print(OneWire3_array[3]);
-
-	}
-}
-/* 
-###########################################################
-				ampTest()  NOT WORKING YET
-Show power input, power output, difference, amps
-		| input : 7.60      |
-		| output: 3.47      |
-		| diff  : 4.13      |
-		| amps  : 0.00      |
-###########################################################
-*/
-void ampTest(void){
-	if(first==1){
-		firstLoop();
-	}
-	if(first==0){
-		float input = voltageRatio(voltage(i2c_a2_array[3]),2);
-		float output = voltageRatio(voltage(i2c_a3_array[3]),3);
-		float half = input/2;
-		float diff = half - output; 
-		//float current = (output - (half+0.2)) / 0.033;
-		float current = (output - half) / 0.033;
-
-		lcdSerial.write(0x01); // Home
-		lcdSerial.write(0x03);
-		lcdSerial.print("input : ");
-		lcdSerial.print(input);
-		lcdSerial.write(0x0D); // Carriage Return
-		lcdSerial.print("output: ");
-		lcdSerial.print(output);
-		lcdSerial.write(0x0D); // Carriage Return
-		lcdSerial.print("half   : ");
-		lcdSerial.print(half);
-		lcdSerial.write(0x0D); // Carriage Return
-		lcdSerial.print("current: ");
-		lcdSerial.print(current);
-
-		//Current = ((analogRead(1)*(5.00/1024))- 2.5)/ .017;
 	}
 }
 
-/* 
-###########################################################
-				voltageDividerTest()
-Show raw input, voltage calculation, and multiply for vdivider
-		| 3001 3.01 7.57   |
-		| 2589 2.60 3.45   |
-		| 2842 2.86 12.10  |
-		| 2507 2.52 10.63  |
-###########################################################
-*/
-void voltageDividerTest(void){
-	if(first==1){
-		firstLoop();
-	}
-	if(first==0){
-		lcdSerial.write(0x01); // Home
-		lcdSerial.write(0x03);
-		lcdSerial.print(i2c_a2_array[3],0);
-		lcdSerial.print(" ");	
-		lcdSerial.print(voltage(i2c_a2_array[3]),2);
-		lcdSerial.print(" ");
-		lcdSerial.print(voltageRatio(voltage(i2c_a2_array[3]),2));
-			lcdSerial.write(0x0D); // Carriage Return
-		lcdSerial.print(i2c_a3_array[3],0);
-		lcdSerial.print(" ");	
-		lcdSerial.print(voltage(i2c_a3_array[3]),2);
-		lcdSerial.print(" ");
-		lcdSerial.print(voltageRatio(voltage(i2c_a3_array[3]),3));
-				lcdSerial.write(0x0D); // Carriage Return
-		lcdSerial.print(i2c_a4_array[3],0);
-		lcdSerial.print(" ");	
-		lcdSerial.print(voltage(i2c_a4_array[3]),2);
-		lcdSerial.print(" ");
-		lcdSerial.print(voltageRatio(voltage(i2c_a4_array[3]),4));
-				lcdSerial.write(0x0D); // Carriage Return
-		lcdSerial.print(i2c_a5_array[3],0);
-		lcdSerial.print(" ");	
-		lcdSerial.print(voltage(i2c_a5_array[3]),2);
-		lcdSerial.print(" ");
-		lcdSerial.print(voltageRatio(voltage(i2c_a5_array[3]),5));
-	}
-}
 
-/* 
-###########################################################
-				buttonTest()
-Show button1 and button2 press state
-###########################################################
-*/
-void buttonTest(void){
-	//lcdSerial.write(0x0C);
-	//delay(500);
-	lcdSerial.write(0x01);  // Home cursor
-	lcdSerial.write(0x03);  // normal font
-	lcdSerial.print("Button Test");
-	// read the state of the pushbutton value:
-	button1State = digitalRead(BUTTON1);
-	button2State = digitalRead(BUTTON2);
-	//button2State = digitalRead(BUTTON2);
 
-	// check if the pushbutton is pressed.
-	// if it is, the buttonState is HIGH:
-	if (button1State == HIGH) {   
-		lcdSerial.write(0x0C);
-		lcdSerial.write(0x0D); // beginning next line)
-		lcdSerial.print("Button 1 pressed");
-	} 
-	else {
-		lcdSerial.write(0x01);  // Home cursor
-		lcdSerial.write(0x03);  // normal font
-		lcdSerial.print("Button Test");
-	}
-	if (button2State == HIGH) {
-		lcdSerial.write(0x0C);
-		lcdSerial.write(0x0D); // beginning next line)
-		lcdSerial.print("Button 2 pressed");
-	}
-	else {
-		lcdSerial.write(0x01);  // Home cursor
-		lcdSerial.write(0x03);  // normal font
-		lcdSerial.print("Button Test");
-	}
-
-	//lcdSerial.print("Button1: ")
-}
-
-/*
-###########################################################
-				screenTest()
-Show all fonts and fills the screen in each mode
-###########################################################
-*/
-void screenTest(void){
-	lcdSerial.write(0x0C);
-	delay(500);
-	lcdSerial.write(0x01);  // Home cursor
-	lcdSerial.write(0x03);  // normal font
-	lcdSerial.print("0123456789abcdef");
-	lcdSerial.print("0123456789abcdef");
-	lcdSerial.print("0123456789abcdef");
-	lcdSerial.print("0123456789abcdef");
-	delay(1000);
-
-	lcdSerial.write(0x0C);
-	delay(500);
-	lcdSerial.write(0x01);  // Home cursor
-	lcdSerial.write(0x03);  // normal font
-	setFont(2);
-	lcdSerial.print("0123456789abcdef");
-	lcdSerial.print("0123456789abcdef");	
-	delay(1000);
-
-	lcdSerial.write(0x0C);
-	delay(500);
-	lcdSerial.write(0x01);  // Home cursor
-	lcdSerial.write(0x03);  // normal font
-	setFont(3);
-	lcdSerial.print("01234567");
-	lcdSerial.print("01234567");	
-	lcdSerial.print("01234567");
-	lcdSerial.print("01234567");	
-	delay(1000);
-
-	lcdSerial.write(0x0C);
-	delay(500);
-	lcdSerial.write(0x01);  // Home cursor
-	lcdSerial.write(0x03);  // normal font
-	setFont(4);
-	lcdSerial.print("01234567");
-	lcdSerial.print("01234567");	
-	delay(1000);
-
-	lcdSerial.write(0x0C);
-	delay(500);
-	lcdSerial.write(0x01);  // Home cursor
-	lcdSerial.write(0x03);  // normal font
-	setFont(5);
-	lcdSerial.print("01234567");
-	delay(1000);
-
-	lcdSerial.write(0x0C);
-	delay(500);
-	lcdSerial.write(0x01);  // Home cursor
-	lcdSerial.write(0x03);  // normal font
-	setFont(6);
-	lcdSerial.print("0123");
-	delay(1000);
-
-	lcdSerial.write(0x0C);
-	delay(500);
-	lcdSerial.write(0x01);  // Home cursor
-	lcdSerial.write(0x03);  // normal font
-	setFont(6);
-	lcdSerial.write(0x13);
-	lcdSerial.print("0123");
-	delay(3000);
-}
 
 /* 
 ###########################################################
@@ -758,7 +644,7 @@ void firstLoop(void){
 	lcdSerial.write(0x12); // ctrl-R right-align the data, erasing unused digits
     lcdSerial.write('3'); // # digits
 	lcdSerial.print((CNT+VAR)-current_count);
-	if(current_count >= CNT+VAR-2){
+	if(current_count >= CNT+VAR-4){
 		lcdSerial.write(0x0C);
 	}
 }
