@@ -2,8 +2,6 @@
 // 3rd party libraries
 #include <OneWire.h>
 #include <DallasTemperature.h>
-#include <DHT.h>
-#include <Adafruit_GPS.h>
 
 // build in libraries
 #include <SoftwareSerial.h>
@@ -17,14 +15,13 @@
 */ 
 
 #define ONE_WIRE_BUS 4  // data pin for one wire temp sensors
-#define DHTPIN 13     // data pin for AM2302 Temp/Humidity sen
 #define BUTTON1 8
 #define BUTTON2 9           
 #define LIGHTSENSOR A0 //A0 --> 14
 
+
 SoftwareSerial lcdSerial(10, 11, 1);  //RX, TX, Inverted
 SoftwareSerial segSerial(6, 5);  //RX, TX
-
 
 
 
@@ -62,8 +59,6 @@ float OneWire2_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // OneWire2
 float OneWire3_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // OneWire3
 float OneWire4_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // OneWire4
 float OneWireW_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // OneWireW
-float AM2302_t[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // AM2302 Temperature
-float AM2302_h[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // AM2302 Humidity
 float i2c_a2_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // i2c Analog Input 2
 float i2c_a3_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // i2c Analog Input 3
 float i2c_a4_array[CNT+VAR] = {-99.0, 999.9, -999.9, -999.9}; // i2c Analog Input 4
@@ -77,7 +72,7 @@ int button1State;
 int button2State;
 int lastButton1State = LOW;
 
-int menuItems = 5;
+int menuItems = 7;
 int menuItem = 0;
 
 /* 
@@ -87,7 +82,6 @@ int menuItem = 0;
 */
 
 OneWire oneWire(ONE_WIRE_BUS); // Setup a oneWire instance to communicate with any OneWire devices
-DHT dht(DHTPIN, DHT22); // AM2302 Sensor Connection.  Removed reference to DHT22 and called it directly
 DallasTemperature sensors(&oneWire); // Pass our oneWire reference to Dallas Temperature. 
 
 
@@ -100,6 +94,7 @@ DallasTemperature sensors(&oneWire); // Pass our oneWire reference to Dallas Tem
 // light sensor to dim lcd screen
 
 float stableLight = 0;
+float rawLight = 0;
 int lightSensorMax = 0; // lowest value to start
 int lightSensorMin =  1023;  // highest valuse to start
 int clearScreen;  //just needs to be defined for later 
@@ -116,7 +111,9 @@ void setup(void)
 	// Set buttons to input  
 	pinMode(BUTTON1, INPUT); 
 	pinMode(BUTTON2, INPUT); 
-	
+
+
+
 	// set resolution of OneWire temperature Sensors to 12 bits
 	sensors.setResolution(OneWire1, 12);
 	sensors.setResolution(OneWire2, 12);
@@ -124,22 +121,22 @@ void setup(void)
 	sensors.setResolution(OneWire4, 12);
 	sensors.setResolution(OneWireW, 12);
 
-	// start DHT libarary for AM2302 Sensor
-	dht.begin();
 
 	// Start Serial ports
 	lcdSerial.begin(9600);
-	Serial.begin(9600);
+	//Serial.begin(9600);
 	resetScreen();
 	delay(1000);
 	startupScreen();
-	// screenTest();
 
 	// wire library for I2C AD. join i2c bus 
 	Wire.begin();
 
 	delay(1000);
 }
+
+
+
 
 /* 
 ############################################
@@ -149,13 +146,16 @@ void setup(void)
 
 void loop(void)
 {
+
+
+
 	current_count = current_count + 1;
 	if(current_count >= CNT+VAR){
 		current_count=VAR-1;
 		first = 0;
 	}
-
-	stableLight = stableLight * 0.98 + analogRead(LIGHTSENSOR) * 0.02;
+	rawLight = analogRead(LIGHTSENSOR);
+	stableLight = stableLight * 0.98 + rawLight * 0.02;
 
 	sensors.requestTemperatures();
 	OneWire1_array[0] = DallasTemperature::toFahrenheit(sensors.getTempC(OneWire1));
@@ -163,8 +163,6 @@ void loop(void)
 	OneWire3_array[0] = DallasTemperature::toFahrenheit(sensors.getTempC(OneWire3));
 	OneWire4_array[0] = DallasTemperature::toFahrenheit(sensors.getTempC(OneWire4));
 	OneWireW_array[0] = DallasTemperature::toFahrenheit(sensors.getTempC(OneWireW));
-	// AM2302_t[0] = DallasTemperature::toFahrenheit(dht.readTemperature());
-	// AM2302_h[0] = dht.readHumidity();
 	i2c_a2_array[0] = getAnalogInput(2);
 	i2c_a3_array[0] = getAnalogInput(3);
 	i2c_a4_array[0] = getAnalogInput(4);
@@ -175,8 +173,6 @@ void loop(void)
 	setMinMax(OneWire3_array);
 	setMinMax(OneWire4_array);
 	setMinMax(OneWireW_array);
-	// setMinMax(AM2302_t);
-	// setMinMax(AM2302_h);
 	setMinMax(i2c_a2_array);
 	setMinMax(i2c_a3_array);
 	setMinMax(i2c_a4_array);
@@ -187,17 +183,10 @@ void loop(void)
 	getTemp(OneWire3_array, current_count);
 	getTemp(OneWire4_array, current_count);
 	getTemp(OneWireW_array, current_count);
-	// getTemp(AM2302_t, current_count);
-	// getTemp(AM2302_h, current_count);
 	getTemp(i2c_a2_array, current_count);
 	getTemp(i2c_a3_array, current_count);
 	getTemp(i2c_a4_array, current_count);
 	getTemp(i2c_a5_array, current_count);
-
-
-	// voltageDividerTest(); 
-	// ampTest();
-	// buttonTest();
 
 	button1State = digitalRead(BUTTON1);
 	if(button1State != lastButton1State){ //compare increment button state to its last state
@@ -212,6 +201,7 @@ void loop(void)
 	}
 	lastButton1State = button1State;
 
+	dimScreen(200);
 
 	// cycle through screens from button  press
 	switch (menuItem){
@@ -233,6 +223,10 @@ void loop(void)
 		case 5:
 			insideTempDetail();
 			break;
+		case 6:
+			lightDetail();
+			break;
+		
 	}
 }
 
@@ -453,8 +447,6 @@ void voltageScreen(void){
 	}
 }
 
-
-
 /* 
 ###########################################################
 				tempScreen1()
@@ -601,10 +593,32 @@ void insideTempDetail(void){
 		lcdSerial.print(OneWire3_array[3]);
 	}
 }
-
-
-
-
+/* 
+###########################################################
+			lightDetail()
+			Show raw light sensor data
+		| Light Sensor    |
+		| Actual : 12.45  |  
+		| Soft   : 10.83  |  
+		| 			      |  
+###########################################################
+*/
+void lightDetail(void){
+	if(first==1){
+		firstLoop();
+	}
+	if(first==0){
+		lcdSerial.write(0x01); // Home
+		lcdSerial.write(0x03);
+		lcdSerial.print("Light Sensor");
+		lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print("Actual : ");
+		lcdSerial.print(rawLight);
+		lcdSerial.write(0x0D); // Carriage Return
+		lcdSerial.print("Soft   : ");
+		lcdSerial.print(stableLight);
+	}
+}
 /* 
 ###########################################################
 				startupScreen()
