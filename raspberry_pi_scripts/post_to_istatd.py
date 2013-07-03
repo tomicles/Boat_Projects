@@ -9,10 +9,10 @@ import os
 from daemon import Daemon
 from functools import partial
 
-def send_to_istatd(sock, dest, counter, data):
+def send_to_istatd(counter, data, sock, dest):
     sock.sendto("{counter} {data}\n".format(counter=counter, data=data), dest)
 
-def extract_data(send_fun, file):
+def extract_data(file, send_fun):
     def read(file):
         with open(file, 'r') as f:
             return f.read()
