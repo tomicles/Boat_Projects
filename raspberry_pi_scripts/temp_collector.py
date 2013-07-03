@@ -7,10 +7,10 @@ class TempCollector(object):
         self.temps = map(lambda x: Temp(x), self.temp_names)
         self.open = fopen #for testing ........ nope
         def dataWriter(file, data, prefix=''):
-            with self.open('{prefix}{file}'.format(prefix=prefix, file=file), 'w') as f:
-                f.write(data)
+            with self.open('{prefix}/temp.{file}.out'.format(prefix=prefix, file=file), 'w') as f:
+                f.write('{data}'.format(data))
 
-        self.writer = partial(dataWriter, prefix='/var/tmp/data/')
+        self.writer = partial(dataWriter, prefix='/var/tmp/data')
 
 
     def loop_once(self):
