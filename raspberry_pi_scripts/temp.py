@@ -1,9 +1,10 @@
 import os
 import time
 
-CABLE_TEMP_FILE = '/sys/bus/w1/devices/28-0000042b8948/w1_slave'
+OUTSIDE_TEMP_FILE = '/sys/bus/w1/devices/28-0000042b8948/w1_slave'
 SYS_TEMP_FILE = '/sys/bus/w1/devices/28-0000047accc8/w1_slave'
 WATER_TEMP_FILE = '/sys/bus/w1/devices/28-000003cb5f1f/w1_slave'
+INSIDE_TEMP_FILE = '/sys/bus/w1/devices/28-00000400df12/w1_slave'
 
 
 class Temp(object):
@@ -13,8 +14,9 @@ class Temp(object):
 
     __mapping = {
         'sys':SYS_TEMP_FILE,
-        'cable':CABLE_TEMP_FILE,
+        'outside':OUTSIDE_TEMP_FILE,
         'water':WATER_TEMP_FILE,
+        'inside':INSIDE_TEMP_FILE,
     }
 
     @staticmethod

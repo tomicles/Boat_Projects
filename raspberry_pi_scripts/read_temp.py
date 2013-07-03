@@ -9,7 +9,7 @@ from temp_collector import TempCollector
 
 class TempDaemon(Daemon):
     def run(self):
-        temp_collector = TempCollector(['sys','cable','water'])
+        temp_collector = TempCollector(['sys','outside','water','inside'])
         while True:
             temp_collector.loop_once()
             time.sleep(1)
