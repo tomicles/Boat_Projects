@@ -5,9 +5,13 @@ import time
 import socket
 import glob
 import os
-
+import subprocess as sp
 from daemon import Daemon
 from functools import partial
+
+def get_ip():
+    res = sp.call("iwconfig | grep Mifi-Santana2023", shell=True)
+    return socket.gethostbyaddr("hackercomplex.dyndns.org")[2][2] if res == 1 else "192.168.24.239"
 
 def send_to_istatd(counter, data, sock, dest):
     sock.sendto("{counter} {data}\n".format(counter=counter, data=data), dest)
@@ -23,7 +27,7 @@ def extract_data(file, send_fun):
 
 class IstatdDaemon(Daemon):
     def run(self):
-        ip = socket.gethostbyaddr("hackercomplex.dyndns.org")[2][0]
+        ip = get_ip()
         send_with_ip = partial(send_to_istatd, dest=(ip, 18001))
         while True:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
