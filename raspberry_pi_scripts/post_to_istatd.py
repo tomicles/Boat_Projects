@@ -11,7 +11,7 @@ from functools import partial
 
 def get_ip():
     res = sp.call("iwconfig | grep Mifi-Santana2023", shell=True)
-    return socket.gethostbyaddr("hackercomplex.dyndns.org")[2][2] if res == 1 else "192.168.24.239"
+    return  "192.168.24.239" if res == 1 else socket.gethostbyaddr("hackercomplex.dyndns.org")[2][0]
 
 def send_to_istatd(counter, data, sock, dest):
     sock.sendto("{counter} {data}\n".format(counter=counter, data=data), dest)
