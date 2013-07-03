@@ -1,3 +1,4 @@
 [submodule "raspberry_pi_scripts/lib/Adafruit_Libraries"]
 	path = raspberry_pi_scripts/lib/Adafruit_Libraries
 	url = https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code.git
+    ignore = dirty
