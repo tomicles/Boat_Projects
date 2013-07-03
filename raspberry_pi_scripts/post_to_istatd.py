@@ -17,7 +17,8 @@ def extract_data(file, send_fun):
         with open(file, 'r') as f:
             return f.read()
 
-    counter, _ = os.path.splitext(file)
+    counter_path, _ = os.path.splitext(file)
+    _, counter = os.path.split(counter_path)
     send_fun(counter=counter, data=read(file))
 
 class IstatdDaemon(Daemon):
