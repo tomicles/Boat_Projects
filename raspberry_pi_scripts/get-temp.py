@@ -7,9 +7,9 @@ import time
 os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
 
-#cable_temp_file = '/sys/bus/w1/devices/28-0000042b8948/w1_slave'
+cable_temp_file = '/sys/bus/w1/devices/28-0000042b8948/w1_slave'
 sys_temp_file = '/sys/bus/w1/devices/28-0000047accc8/w1_slave'
-#water_temp_file = '/sys/bus/w1/devices/28-000003cb5f1f/w1_slave'
+water_temp_file = '/sys/bus/w1/devices/28-000003cb5f1f/w1_slave'
 
 def read_temp_raw2(file):
     with open(file, 'r') as f:
@@ -35,6 +35,6 @@ def read_temp(file):
         temp_f = temp_c * 9.0 / 5.0 + 32.0
         return temp_f
 
-#print "Cable Temp: %s" % (read_temp(cable_temp_file))
+print "temp.cable %s" % (read_temp(cable_temp_file))
 print "temp.sys %s" % (read_temp(sys_temp_file))
-#print "Water Temp: %s" % (read_temp(water_temp_file))
+print "temp.water %s" % (read_temp(water_temp_file))
