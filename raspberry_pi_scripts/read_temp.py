@@ -2,12 +2,14 @@ import sys
 import time
 
 from daemon import Daemon
+from temp_collector import TempCollector
 
 
 class TempDaemon(Daemon):
     def run(self):
+        temp_collector = TempCollector(['sys','cable','water'])
         while True:
-            print 'running'
+            temp_collector.loop_once()
             time.sleep(1)
 
 
