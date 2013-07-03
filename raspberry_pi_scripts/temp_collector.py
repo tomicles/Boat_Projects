@@ -1,14 +1,12 @@
 from functools import partial
 from temp import Temp
+from util import dataWriter
 
 class TempCollector(object):
-    def __init__(self, names, fopen=open):
-        self.temp_names = names#['sys', 'cable', 'water']
+    def __init__(self, indexes, fopen=open):
+        self.temp_indexes = indexes#['sys', 'cable', 'water']
+        self.temp_names = ['temp.{index}'.format(index=x) for x in indexes]
         self.temps = map(lambda x: Temp(x), self.temp_names)
-        self.open = fopen #for testing ........ nope
-        def dataWriter(file, data, prefix=''):
-            with self.open('{prefix}/temp.{file}.out'.format(prefix=prefix, file=file), 'w') as f:
-                f.write('{data}'.format(data=data))
 
         self.writer = partial(dataWriter, prefix='/var/tmp/data')
 
