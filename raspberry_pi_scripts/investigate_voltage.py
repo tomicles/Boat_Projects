@@ -27,7 +27,7 @@ def investigate_voltage(data):
     z1 = 3220
     z2 = 995
     vin = vout * (z1+z2) / z2
-    print vin
+    print 'for vout ', vout, ' vin: ', vin
 
 class InvestigateVoltageDaemon(Daemon):
     def run(self):
