@@ -1,6 +1,6 @@
 import serial
 import time
-ser = serial.Serial(port='/dev/ttyUSB2')
+ser = serial.Serial(port='/dev/ttyUSB0')
 
 # Clear Screen
 ser.write('\x76')
