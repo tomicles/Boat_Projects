@@ -15,15 +15,26 @@ import serial
 
 
 def send_to_4seg(data, ser):
-    ser.write('\x77')
-    ser.write('\x00')
-    ser.write('\x79')
-    ser.write('\x00')
+    def reset_position():
+        ser.write('\x79')
+        ser.write('\x00')
+
+    def write_dec(pos):
+        ser.write('\x77')
+        ser.write(pos)
+
+    def clear_decimal():
+        write_dec('\x00')
+
     idx = string.find(data, '.')
     if idx == -1 or idx > 3:
+        clear_decimal()
+        reset_position()
         four = data[:4]
         ser.write(four)
     elif idx == 0:
+        clear_decimal()
+        reset_position()
         four = data[1:5]
         ser.write(four)
     else: #idx <=3
@@ -37,9 +48,6 @@ def send_to_4seg(data, ser):
             4: '\x08', 
             }.get(idx)
 
-        def write_dec(pos):
-            ser.write('\x77')
-            ser.write(pos)
 
         ser.write(four)
         write_dec(idx_to_binstr(idx))
