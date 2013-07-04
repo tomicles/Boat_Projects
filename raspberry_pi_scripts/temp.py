@@ -1,35 +1,15 @@
 import os
 import time
 
-OUTSIDE_TEMP_FILE = '/sys/bus/w1/devices/28-0000042b8948/w1_slave'
-SYS_TEMP_FILE = '/sys/bus/w1/devices/28-0000047accc8/w1_slave'
-WATER_TEMP_FILE = '/sys/bus/w1/devices/28-000003cb5f1f/w1_slave'
-INSIDE_TEMP_FILE = '/sys/bus/w1/devices/28-00000400df12/w1_slave'
-
 
 class Temp(object):
     """
     An object that will encapsulate reading data from one of the system files associated with a temperature sensor
     """
 
-    __mapping = {
-        'sys':SYS_TEMP_FILE,
-        'outside':OUTSIDE_TEMP_FILE,
-        'water':WATER_TEMP_FILE,
-        'inside':INSIDE_TEMP_FILE,
-    }
-
-    @staticmethod
-    def get_mapping():
-        return Temp.__mapping
-
-    @staticmethod
-    def get_file(type):
-        return Temp.get_mapping().get(type)
-
-    def __init__(self, type):
+    def __init__(self, type, file):
         self.type = type
-        self.file = Temp.get_file(type) 
+        self.file = file
 
     def __read_temp_raw2(self):
         with open(self.file, 'r') as f:
