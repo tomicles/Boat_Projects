@@ -30,7 +30,7 @@ def send_to_4seg(data, ser):
             return 2**(index-1)
 
         def bin_to_str(bin):
-            return '\x0{b}'.format(b=bin)
+            return '\\x0{b}'.format(b=bin)
 
         def write_dec(pos):
             ser.write('\x77')
@@ -53,13 +53,13 @@ def extract_data(file, send_fun):
 
 class FourSegDaemon(Daemon):
     def run(self):
-        ser = serial.Serial(port='/dev/ttyUSB0')
+        ser = serial.Serial(port='/dev/ttyUSB1')
         send_with_dev = partial(send_to_4seg, ser=ser)
         while True:
             extract_from_file = partial(extract_data, send_fun=send_with_dev)
             maybe_extract_from_file = partial(maybe_extract_data, extract_fun=extract_from_file)
 
-            maybe_extract_from_file('/var/tmp/data/gps.speed')
+            maybe_extract_from_file('/var/tmp/data/gps.speed.out')
             time.sleep(5)
 
 
