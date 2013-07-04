@@ -18,16 +18,16 @@ if [ "$_IP" ]; then
 fi
 
 #/bin/sleep 10
+#printf "Starting SSH reverse tunnel"
 #/etc/tunnel/tunnel.sh
 
+printf "Starting GPSd\n"
+/usr/sbin/gpsd /dev/ttyUSB0 -F /var/run/gpsd.sock
+
 /bin/sleep 5
-printf "Starting data collecion"
+printf "Starting data collecion\n"
 /usr/bin/python /home/pi/Boat_Projects/raspberry_pi_scripts/read_temp.py start
 /usr/bin/python /home/pi/Boat_Projects/raspberry_pi_scripts/read_voltage.py start
-
-printf "Starting GPSd"
-/usr/bin/gpsd /dev/ttyUSB0 -F /var/run/gpsd.sock
-/bin/sleep 5
 
 /usr/bin/python /home/pi/Boat_Projects/raspberry_pi_scripts/read_gps.py start
 /usr/bin/python /home/pi/Boat_Projects/raspberry_pi_scripts/post_to_4seg.py start
