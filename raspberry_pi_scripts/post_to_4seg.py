@@ -30,9 +30,9 @@ def send_to_4seg(data, ser):
         def idx_to_binstr(bin):
             return {
             1: '\x01', 
-            2: '\x01', 
-            3: '\x01', 
-            4: '\x01', 
+            2: '\x02', 
+            3: '\x04', 
+            4: '\x08', 
             }.get(idx)
 
         def write_dec(pos):
