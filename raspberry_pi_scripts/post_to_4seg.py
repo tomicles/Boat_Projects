@@ -15,7 +15,6 @@ import serial
 
 
 def send_to_4seg(data, ser):
-    ser.write('\x76')
     ser.write('\x79')
     ser.write('\x00')
     idx = string.find(data, '.')
@@ -58,6 +57,8 @@ def extract_data(file, send_fun):
 class FourSegDaemon(Daemon):
     def run(self):
         ser = serial.Serial(port='/dev/ttyUSB1')
+        ser.write('\x76')
+
         send_with_dev = partial(send_to_4seg, ser=ser)
         while True:
             extract_from_file = partial(extract_data, send_fun=send_with_dev)
