@@ -27,7 +27,7 @@ class VoltageCollector(object):
             "-c",
             "--config",
             dest="config",
-            default="/etc/voltage_daemon.cfg",
+            default="/etc/default/voltage_daemon.cfg",
             help="Config file"
         )
 
