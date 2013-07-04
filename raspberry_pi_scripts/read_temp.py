@@ -34,7 +34,7 @@ def main(argv):
     elif 'run' == daemon_args[1]:
         myDaemon.run()
     else:
-        print 'usage: {script} start|stop|restart|run'.format(script=daemon_args[0])
+        print 'usage: {script} start|stop|restart|run [-- app_args*]'.format(script=daemon_args[0])
         sys.exit(2)
     sys.exit(0)
 
