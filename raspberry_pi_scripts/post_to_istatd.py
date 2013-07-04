@@ -5,6 +5,7 @@ import time
 import socket
 import glob
 import os
+import time
 import subprocess as sp
 from daemon import Daemon
 from functools import partial
@@ -15,6 +16,10 @@ def get_ip():
 
 def send_to_istatd(counter, data, sock, dest):
     sock.sendto("{counter} {data}\n".format(counter=counter, data=data), dest)
+
+def maybe_extract_data(file, extract_fun):
+    if (time.time() - os.path.getmtime(file)) < 30:
+        extract_fun(file)
 
 def extract_data(file, send_fun):
     def read(file):
@@ -33,8 +38,9 @@ class IstatdDaemon(Daemon):
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             send_with_socket = partial(send_with_ip, sock=sock)
             extract_from_file = partial(extract_data, send_fun=send_with_socket)
+            maybe_extract_from_file = partial(maybe_extract_data, extract_fun=extract_from_file)
 
-            map( extract_from_file, glob.glob('/var/tmp/data/*.out'))
+            map( maybe_extract_from_file, glob.glob('/var/tmp/data/*.out'))
             time.sleep(5)
 
 
