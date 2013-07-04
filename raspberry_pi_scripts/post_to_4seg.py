@@ -15,6 +15,8 @@ import serial
 
 
 def send_to_4seg(data, ser):
+    ser.write('\x77')
+    ser.write('\x00')
     ser.write('\x79')
     ser.write('\x00')
     idx = string.find(data, '.')
