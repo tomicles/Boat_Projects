@@ -19,7 +19,6 @@ def send_to_4seg(data, ser):
     ser.write('\x79')
     ser.write('\x00')
     idx = string.find(data, '.')
-    print 'raw', data
     if idx == -1 or idx > 3:
         four = data[:4]
         ser.write(four)
@@ -29,19 +28,20 @@ def send_to_4seg(data, ser):
     else: #idx <=3
         four = data[:idx]+data[idx+1:5]
 
-        def idx_to_bin(index):
-            return 2**(index-1)
-
-        def bin_to_str(bin):
-            print 'position', bin
-            return '\\x0{b}'.format(b=bin)
+        def idx_to_binstr(bin):
+            return {
+            1: '\x01', 
+            2: '\x01', 
+            3: '\x01', 
+            4: '\x01', 
+            }.get(idx)
 
         def write_dec(pos):
             ser.write('\x77')
             ser.write(pos)
 
         ser.write(four)
-        write_dec(bin_to_str(idx_to_bin(idx)))
+        write_dec(idx_to_binstr(idx))
 
 
 def maybe_extract_data(file, extract_fun):
