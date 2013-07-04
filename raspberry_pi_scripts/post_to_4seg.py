@@ -64,7 +64,7 @@ class FourSegDaemon(Daemon):
             maybe_extract_from_file = partial(maybe_extract_data, extract_fun=extract_from_file)
 
             maybe_extract_from_file('/var/tmp/data/gps.speed.out')
-            time.sleep(5)
+            time.sleep(.5)
 
 
 def main(argv):

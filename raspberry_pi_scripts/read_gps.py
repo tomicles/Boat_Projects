@@ -21,7 +21,7 @@ class GpsDaemon(Daemon):
             if report['class'] == 'TPV':
                 if hasattr(report, 'speed'):
                     writer('gps.speed', report.speed)
-            time.sleep(1)
+            time.sleep(.5)
 
 
 def main(argv):
