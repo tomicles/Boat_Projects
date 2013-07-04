@@ -69,7 +69,7 @@ class FourSegDaemon(Daemon):
 
 
 def main(argv):
-    myDaemon = FourSegDaemon('/tmp/istatd.pid')
+    myDaemon = FourSegDaemon('/tmp/4seg.pid')
 
     if 'start' == argv[1]:
         myDaemon.start()
