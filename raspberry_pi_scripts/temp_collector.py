@@ -6,7 +6,7 @@ class TempCollector(object):
     def __init__(self, indexes, fopen=open):
         self.temp_indexes = indexes#['sys', 'cable', 'water']
         self.temp_names = ['temp.{index}'.format(index=x) for x in indexes]
-        self.temps = map(lambda x: Temp(x), self.temp_names)
+        self.temps = map(lambda x: Temp(x), self.temp_indexes)
 
         self.writer = partial(dataWriter, prefix='/var/tmp/data')
 
