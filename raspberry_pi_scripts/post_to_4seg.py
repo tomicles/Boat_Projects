@@ -16,7 +16,10 @@ import serial
 
 def send_to_4seg(data, ser):
     ser.write('\x76')
+    ser.write('\x79')
+    ser.write('\x00')
     idx = string.find(data, '.')
+    print 'raw', data
     if idx == -1 or idx > 3:
         four = data[:4]
         ser.write(four)
@@ -30,6 +33,7 @@ def send_to_4seg(data, ser):
             return 2**(index-1)
 
         def bin_to_str(bin):
+            print 'position', bin
             return '\\x0{b}'.format(b=bin)
 
         def write_dec(pos):
