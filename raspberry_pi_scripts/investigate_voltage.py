@@ -34,7 +34,7 @@ class InvestigateVoltageDaemon(Daemon):
         while True:
             extract_from_file = partial(extract_data, investigate_fun=investigate_voltage)
 
-            map( extract_from_file, glob.glob('/var/tmp/data/volate.*.out'))
+            map( extract_from_file, glob.glob('/var/tmp/data/voltage.*.out'))
             time.sleep(5)
 
 
