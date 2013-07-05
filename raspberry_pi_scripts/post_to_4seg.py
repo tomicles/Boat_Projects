@@ -48,6 +48,7 @@ def send_to_4seg(data, ser):
             4: '\x08', 
             }.get(idx)
 
+        reset_position()
 
         ser.write(four)
         write_dec(idx_to_binstr(idx))
