@@ -85,8 +85,9 @@ class FourSegDaemon(Daemon):
         ser.write('\x76')
 
         send_with_dev = partial(send_to_4seg, ser=ser)
+
+        bottle.run(host='localhost',port=8091)
         while True:
-            bottle.run(host='localhost',port=8091)
             extract_from_file = partial(extract_data, send_fun=send_with_dev)
             maybe_extract_from_file = partial(maybe_extract_data, extract_fun=extract_from_file)
 
