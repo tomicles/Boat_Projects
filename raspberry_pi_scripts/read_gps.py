@@ -15,14 +15,24 @@ class GpsDaemon(Daemon):
         session = gps.gps('localhost', '2947')
         session.stream(gps.WATCH_ENABLE | gps.WATCH_NEWSTYLE)
         writer = partial(dataWriter, prefix='/var/tmp/data')
+
+        def maybe_new_max_speed(speed, old_speed):
+            new_speed = speed if speed > old_speed else old_speed
+            writer('gps.max_speed', new_speed)
+            return partial(maybe_new_max_speed, old_speed=new_speed)
+
+        maybe_record_new_max_speed1 = partial(maybe_new_max_speed, old_speed=0)
         while True:
             report = session.next()
 
             if report['class'] == 'TPV':
                 if hasattr(report, 'speed'):
                     writer('gps.speed', report.speed * gps.MPS_TO_KNOTS)
-                import pprint
-                pprint.pprint(report)
+                    maybe_record_new_max_speed1 = maybe_record_new_max_speed1(report.speed * gps.MPS_TO_KNOTS)
+                if hasattr(report, 'lat'):
+                    writer('gps.latitude', report.lat)
+                if hasattr(report, 'lon'):
+                    writer('gps.longitude', report.lon)
             time.sleep(.5)
 
 
