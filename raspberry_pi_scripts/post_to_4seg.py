@@ -74,6 +74,11 @@ def extract_data(file, send_fun):
 
     send_fun(data=read(file))
 
+import bottle
+@bottle.route('/')
+def index():
+    return 'Hello'
+
 class FourSegDaemon(Daemon):
     def run(self):
         ser = serial.Serial(port='/dev/ttyUSB1')
@@ -81,6 +86,7 @@ class FourSegDaemon(Daemon):
 
         send_with_dev = partial(send_to_4seg, ser=ser)
         while True:
+            bottle.run(host='localhost',port=8091)
             extract_from_file = partial(extract_data, send_fun=send_with_dev)
             maybe_extract_from_file = partial(maybe_extract_data, extract_fun=extract_from_file)
 
