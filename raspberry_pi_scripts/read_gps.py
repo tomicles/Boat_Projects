@@ -20,7 +20,7 @@ class GpsDaemon(Daemon):
 
             if report['class'] == 'TPV':
                 if hasattr(report, 'speed'):
-                    writer('gps.speed', report.speed * gps.MPS_TO_KPH)
+                    writer('gps.speed', report.speed * gps.MPS_TO_KNOTS)
                 import pprint
                 pprint.pprint(report)
             time.sleep(.5)
