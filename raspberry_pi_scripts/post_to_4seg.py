@@ -37,7 +37,16 @@ def send_to_4seg(data, ser):
         reset_position()
         four = data[1:5]
         ser.write(four)
+    elif idx == 1:
+        four = ' {three}'.format(three=data[:idx]+data[idx+1:4])
+        reset_position()
+
+        ser.write(four)
+        write_dec('\x02')
+
     else: #idx <=3
+        # 0.011 1.345 10.23 123.3
+        # 00.01  01.34  10.23  123.3
         four = data[:idx]+data[idx+1:5]
 
         def idx_to_binstr(bin):
