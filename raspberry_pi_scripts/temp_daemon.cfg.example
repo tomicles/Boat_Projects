@@ -2,13 +2,7 @@
     "sys" : { 
         "file" : "/sys/bus/w1/devices/28-0000047accc8/w1_slave"
     },
-    "outside" : { 
-        "file" : "/sys/bus/w1/devices/28-0000042b8948/w1_slave"
-    },
     "inside" : { 
         "file" : "/sys/bus/w1/devices/28-00000400df12/w1_slave"
-    },
-    "water" : { 
-        "file" : "/sys/bus/w1/devices/28-000003cb5f1f/w1_slave"
     }
 }
