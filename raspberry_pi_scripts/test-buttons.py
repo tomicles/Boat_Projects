@@ -32,16 +32,19 @@ def tempScreen1():
     ser.write('Temperatures')
     ser.write('\x0D') # Carriage Return
     ser.write('Water  : ')
-    with open ("/var/tmp/data/temp.water.out", "r") as myfile:
+    with open ("/var/tmp/data/temp.water2.out", "r") as myfile:
         watertemp = myfile.read()
     ser.write(watertemp)
-    #ser.write(OneWireW_array[3])
     ser.write('\x0D') # Carriage Return
-    ser.write('Outside: ')
-    #ser.write(OneWire2_array[3])
+    ser.write('System: ')
+    with open ("/var/tmp/data/temp.sys2.out", "r") as myfile:
+        sys2temp = myfile.read()
+    ser.write(sys2temp)
     ser.write('\x0D') # Carriage Return
     ser.write('Inside : ')
-    #ser.write(OneWire3_array[3])
+    with open ("/var/tmp/data/temp.inside2.out", "r") as myfile:
+        inside2temp = myfile.read()
+    ser.write(inside2temp)
 
 
 
