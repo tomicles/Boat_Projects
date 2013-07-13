@@ -17,12 +17,12 @@ while True:
 
 
 
-def setFont(x)
+def setFont(x):
 	for i in xrange(x):
 		ser.write('\x02') 
 		time.sleep(.1)
 
-def resetScreen()
+def resetScreen():
     ser.write('\x03') # set font back to normal
     ser.write('\x01') # Home
     ser.write('\x0C') # clear screen
@@ -50,19 +50,19 @@ def resetScreen()
 # 		| Inside : 7.28   |  
 ############################################################
 
-def tempScreen1()
+def tempScreen1():
 	ser.write('\x01') # Home
 	ser.write('\x03')
-	ser.write('Temperatures")
+	ser.write('Temperatures')
 	ser.write('\x0D') # Carriage Return
-	ser.write('Water  : ")
+	ser.write('Water  : ')
 	with open ("/var/tmp/data/temp.water.out", "r") as myfile:
     	data=myfile.read()
     	ser.write(data)
 	ser.write(OneWireW_array[3])
 	ser.write('\x0D') # Carriage Return
-	ser.write('Outside: ")
+	ser.write('Outside: ')
 	ser.write(OneWire2_array[3])
 	ser.write('\x0D') # Carriage Return
-	ser.write('Inside : ")
+	ser.write('Inside : ')
 	ser.write(OneWire3_array[3])
