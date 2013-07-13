@@ -1,0 +1,35 @@
+menu layout
+
+screen1 (Speed)
+screen2 (Temps)
+screen3 (Voltage)
+screen4 (misc)
+screen5 (damons)
+Setup
+	Daemons
+		gpsd
+			status
+			start
+			stop
+			assign_usb
+				[list of active usb ports]
+				exit
+			exit
+		read_temp
+		read_voltage
+		read_gps
+		post_to_4seg
+		post_to_istatd
+		exit
+	USB Ports
+		ttyACM0
+		ttyUSB0
+		ttyUSB1
+	Brightness
+		auto
+		100
+		75
+		25
+		0
+		exit
+	Exit
