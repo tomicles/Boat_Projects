@@ -35,13 +35,13 @@ def tempScreen1():
     with open ("/var/tmp/data/temp.water.out", "r") as myfile:
         watertemp = myfile.read()
     ser.write(watertemp)
-    ser.write(OneWireW_array[3])
+    #ser.write(OneWireW_array[3])
     ser.write('\x0D') # Carriage Return
     ser.write('Outside: ')
-    ser.write(OneWire2_array[3])
+    #ser.write(OneWire2_array[3])
     ser.write('\x0D') # Carriage Return
     ser.write('Inside : ')
-    ser.write(OneWire3_array[3])
+    #ser.write(OneWire3_array[3])
 
 
 
