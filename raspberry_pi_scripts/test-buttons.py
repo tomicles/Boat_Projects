@@ -34,17 +34,17 @@ def tempScreen1():
     ser.write('Water  : ')
     with open ("/var/tmp/data/temp.water2.out", "r") as myfile:
         watertemp = myfile.read()
-    ser.write(watertemp)
+    ser.write(watertemp[:5])
     ser.write('\x0D') # Carriage Return
     ser.write('System: ')
     with open ("/var/tmp/data/temp.sys2.out", "r") as myfile:
         sys2temp = myfile.read()
-    ser.write(sys2temp)
+    ser.write(sys2temp[:5])
     ser.write('\x0D') # Carriage Return
     ser.write('Inside : ')
     with open ("/var/tmp/data/temp.inside2.out", "r") as myfile:
         inside2temp = myfile.read()
-    ser.write(inside2temp)
+    ser.write(inside2temp[:5])
 
 
 
