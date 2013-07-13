@@ -8,3 +8,5 @@ while True:
 	buttonvalue = ser.readline()
 
 	print buttonvalue
+
+	ser.write(buttonvalue) 
