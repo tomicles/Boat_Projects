@@ -3,7 +3,7 @@
 import serial
 import time
 
-ser = serial.Serial('/dev/ttyACM0', 9600, timeout=0)
+ser = serial.Serial('/dev/ttyACM1', 9600, timeout=0)
 
 def setFont(x):
     for i in xrange(x):
