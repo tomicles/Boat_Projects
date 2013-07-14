@@ -3,23 +3,22 @@
 import serial
 import time
 
-ser = serial.Serial('/dev/ttyACM1', 9600, timeout=0)
 
 class MenuScreens(object):
     @staticmethod
-    def setFont(x):
+    def setFont(x, ser):
         for i in xrange(x):
             ser.write('\x02') 
             time.sleep(.1)
 
     @staticmethod
-    def resetScreen():
+    def resetScreen(ser):
         ser.write('\x03') # set font back to normal
         ser.write('\x01') # Home
         ser.write('\x0C') # clear screen
 
     @staticmethod
-    def titleScreen(title):
+    def titleScreen(title, ser):
         ser.write('\x01') # Home
         ser.write('\x03') # set font back to normal    
         MenuScreens.setFont(1)
@@ -43,7 +42,7 @@ class MenuScreens(object):
     ############################################################
 
     @staticmethod
-    def tempScreen1():
+    def tempScreen1(ser):
         ser.write('System : ')
         with open ("/var/tmp/data/temp.sys2.out", "r") as myfile:
             sys2temp = myfile.read()
@@ -77,7 +76,7 @@ class MenuScreens(object):
     ############################################################
 
     @staticmethod
-    def voltageScreen1():
+    def voltageScreen1(ser):
         ser.write('a0     : ')
         with open ("/var/tmp/data/voltage.raw.a0.out", "r") as myfile:
             a0r = myfile.read()
@@ -111,7 +110,7 @@ class MenuScreens(object):
     ############################################################
 
     @staticmethod
-    def voltageScreen2():
+    def voltageScreen2(ser):
         ser.write('a0     : ')
         with open ("/var/tmp/data/voltage.multiplied.a0.out", "r") as myfile:
             a0 = myfile.read()
@@ -142,35 +141,38 @@ class MenuScreens(object):
     ############################################################
     
     @staticmethod
-    def speedScreen():
+    def speedScreen(ser):
         MenuScreens.setFont(4)
         with open ("/var/tmp/data/gps.speed.out", "r") as myfile:
             speed = myfile.read()
         ser.write(speed[:5])
     
 
-MenuScreens.resetScreen()
-MenuScreens.titleScreen("Temperatures")
-MenuScreens.resetScreen()
-MenuScreens.tempScreen1()
-time.sleep(5)
+if __name__ == '__main__':
+    ser = serial.Serial('/dev/ttyACM1', 9600, timeout=0)
 
-MenuScreens.resetScreen()
-MenuScreens.titleScreen("RawVoltage")
-MenuScreens.voltageScreen1()
-time.sleep(5)
+    MenuScreens.resetScreen(ser)
+    MenuScreens.titleScreen("Temperatures", ser)
+    MenuScreens.resetScreen(ser)
+    MenuScreens.tempScreen1(ser)
+    time.sleep(5)
 
-MenuScreens.resetScreen()
-MenuScreens.titleScreen("Voltage")
-MenuScreens.resetScreen()
-MenuScreens.voltageScreen2()
-time.sleep(5)
+    MenuScreens.resetScreen(ser)
+    MenuScreens.titleScreen("RawVoltage", ser)
+    MenuScreens.voltageScreen1(ser)
+    time.sleep(5)
 
-MenuScreens.resetScreen()
-MenuScreens.titleScreen("Speed")
-MenuScreens.resetScreen()
-MenuScreens.speedScreen()
-time.sleep(5)
+    MenuScreens.resetScreen(ser)
+    MenuScreens.titleScreen("Voltage", ser)
+    MenuScreens.resetScreen(ser)
+    MenuScreens.voltageScreen2(ser)
+    time.sleep(5)
+
+    MenuScreens.resetScreen(ser)
+    MenuScreens.titleScreen("Speed", ser)
+    MenuScreens.resetScreen(ser)
+    MenuScreens.speedScreen(ser)
+    time.sleep(5)
 
 
 
