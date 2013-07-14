@@ -126,6 +126,21 @@ def voltageScreen2():
     ser.write(a3[:5])
 
 
+############################################################
+#       Speed()
+#       Show Speed
+#       |     Speed     |
+#
+#       | 11.23    |
+############################################################
+
+def speedScreen():
+    setFont(4)
+    with open ("/var/tmp/data/gps.speed.out", "r") as myfile:
+        speed = myfile.read()
+    ser.write(speed[:5])
+    
+
 resetScreen()
 titleScreen("Temperatures")
 tempScreen1()
@@ -138,5 +153,10 @@ time.sleep(5)
 titleScreen("Voltage")
 voltageScreen2()
 time.sleep(5)
+
+titleScreen("Speed")
+SpeedScreen()
+time.sleep(5)
+
 
 

@@ -1,9 +1,9 @@
 menu layout
 
-screen1 (Speed)
-screen2 (Temps)
-screen3 (Voltage)
-screen4 (misc)
+screen1 (Temp)
+screen2 (vontage)
+screen3 (Voltage2)
+screen4 (speed)
 screen5 (damons)
 Setup
 	Daemons
