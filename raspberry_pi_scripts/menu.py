@@ -3,6 +3,7 @@
 import os
 import json
 import serial
+import string
 from menuscreens import MenuScreens
 
 
@@ -23,6 +24,7 @@ class Menu(object):
     def __init__(self, dir='./menu'):
         self.base_dir = dir
         self.menu_base = os.path.join(os.path.abspath(dir), 'menu.menuconfig')
+        self.item_index = '1'
         self.populate_menu()
 
     def increment_and_return_index(self):
@@ -37,21 +39,32 @@ class Menu(object):
             menu_start = json.loads(f.read())
 
             for idx,contents in enumerate(menu_start):
-                contents['index'] = self.increment_and_return_index()
+#                contents['index'] = self.increment_and_return_index()
                 if "subtree" in contents['action']['type']:
                     contents['action']['subtree'] = self.populate_menu_level('{f}.menuconfig'.format(f=contents['action']['arg']))
                     menu_start[idx] = contents
         return menu_start
 
     def populate_menu(self):
-        self.item_index = 1
         self.master_menu = self.populate_menu_level(self.menu_base)
 
     def perform_action(self, buttonvalue):
         if buttonvalue == '1':
             pass
             
+    def get_elem(elem, ident):
+        idx = ident.pop()
+        subelem = elem[idx]
+
+        res = elem
+        if 'subtree' in subelem['action']['type']:
+            res = get_elem(subelem['action']['subtree'], ident)
+
+        return res
             
+    def find_current(self):
+        ident = string.split(self.item_index, '.')
+        return self.get_elem(self.master_menu, ident)
  
     def display(self):
         elem = self.find_current() 
