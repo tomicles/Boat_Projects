@@ -22,7 +22,8 @@ def titleScreen(title):
     ser.write(title)
     time.sleep(2)
     ser.write('\x01') # Home
-    ser.write('\x03') # set font back to normal     
+    ser.write('\x03') # set font back to normal
+    ser.write('\x0C') # clear screen     
 
 
  
@@ -73,23 +74,23 @@ def tempScreen1():
 def voltageScreen1():
     ser.write('a0     : ')
     with open ("/var/tmp/data/voltage.raw.a0.out", "r") as myfile:
-        a0 = myfile.read()
-    ser.write(a0[:5])
+        a0r = myfile.read()
+    ser.write(a0r[:5])
     ser.write('\x0D') # Carriage Return    
     ser.write('a1     : ')
     with open ("/var/tmp/data/voltage.raw.a1.out", "r") as myfile:
-        a1 = myfile.read()
-    ser.write(a1[:5])
+        a1r = myfile.read()
+    ser.write(a1r[:5])
     ser.write('\x0D') # Carriage Return
     ser.write('a2 Amps: ')
     with open ("/var/tmp/data/voltage.raw.a2.out", "r") as myfile:
-        a2 = myfile.read()
-    ser.write(a2[:5])
+        a2r = myfile.read()
+    ser.write(a2r[:5])
     ser.write('\x0D') # Carriage Return
     ser.write('a3 Batt: ')
     with open ("/var/tmp/data/voltage.raw.a3.out", "r") as myfile:
-        a3 = myfile.read()
-    ser.write(a3[:5])
+        a3r = myfile.read()
+    ser.write(a3r[:5])
 
 
 ############################################################
