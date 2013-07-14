@@ -1,28 +1,28 @@
 [ 
     { 
-        display: status,
-        action: {
-            type: unknown
+        "display": "status",
+        "action": {
+            "type": "unknown"
         }
     },
     {
-        display: start,
-        action: {
-            type: execute
-            arg: path_to_script start
+        "display": "start",
+        "action": {
+            "type": "execute",
+            "arg": "path_to_script start"
         }
     },
     {
-        display: stop,
-        action: {
-            type: execute
-            arg: path_to_script stop
+        "display": "stop",
+        "action": {
+            "type": "execute",
+            "arg": "path_to_script stop"
         }
     },
     {
-        display: exit,
-        action: {
-            type: upone
+        "display": "exit",
+        "action": {
+            "type": "upone"
         }
     }
 ]

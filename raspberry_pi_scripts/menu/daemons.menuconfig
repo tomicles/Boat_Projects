@@ -1,15 +1,15 @@
 [ 
     {
-        display: gpsd,
-        action: {
-            type: subtree,
-            arg: gpsd
+        "display": "gpsd",
+        "action": {
+            "type": "subtree",
+            "arg": "gpsd"
         }
     },
     {
-        display: exit,
-        action: {
-            type: opone
+        "display": "exit",
+        "action": {
+            "type": "upone"
         }
     }
 ]

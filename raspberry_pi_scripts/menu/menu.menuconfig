@@ -1,20 +1,16 @@
 [
     { 
-        display: speed screen, 
-        action: { 
-            type : function, 
-            arg: speedScreen 
+        "display": "speed screen", 
+        "action": { 
+            "type" : "function", 
+            "arg": "speedScreen" 
         } 
     },
-    screen2 (Temps)
-    screen3 (Voltage)
-    screen4 (misc)
-    screen5 (damons)
     {
-        display: Setup,
-        action: {
-            type: subtree
-            arg : setup,
+        "display": "Setup",
+        "action": {
+            "type": "subtree",
+            "arg" : "setup"
         }
     }
 ]
