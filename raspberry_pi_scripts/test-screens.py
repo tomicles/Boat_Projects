@@ -143,19 +143,23 @@ def speedScreen():
 
 resetScreen()
 titleScreen("Temperatures")
+resetScreen()
 tempScreen1()
 time.sleep(5)
 
 titleScreen("RawVoltage")
+resetScreen()
 voltageScreen1()
 time.sleep(5)
 
 titleScreen("Voltage")
+resetScreen()
 voltageScreen2()
 time.sleep(5)
 
 titleScreen("Speed")
-SpeedScreen()
+resetScreen()
+speedScreen()
 time.sleep(5)
 
 
