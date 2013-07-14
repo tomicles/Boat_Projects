@@ -22,7 +22,7 @@ class MenuScreens(object):
     def titleScreen(title):
         ser.write('\x01') # Home
         ser.write('\x03') # set font back to normal    
-        setFont(1)
+        MenuScreens.setFont(1)
         ser.write(title)
         time.sleep(2)
         ser.write('\x01') # Home
@@ -143,7 +143,7 @@ class MenuScreens(object):
     
     @staticmethod
     def speedScreen():
-        setFont(4)
+        MenuScreens.setFont(4)
         with open ("/var/tmp/data/gps.speed.out", "r") as myfile:
             speed = myfile.read()
         ser.write(speed[:5])
