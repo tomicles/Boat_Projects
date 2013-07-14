@@ -3,7 +3,7 @@
 import serial
 import time
 
-ser = serial.Serial('/dev/ttyACM0', 9600)
+ser = serial.Serial('/dev/ttyACM0', 9600, timeout=0)
 
 def setFont(x):
     for i in xrange(x):
@@ -38,7 +38,6 @@ def titleScreen(title):
 ############################################################
 
 def tempScreen1():
-    titleScreen("Temperatures")
     ser.write('System : ')
     with open ("/var/tmp/data/temp.sys2.out", "r") as myfile:
         sys2temp = myfile.read()
@@ -62,7 +61,7 @@ def tempScreen1():
 
 
 
-
+buttonvalue = 0
 
 
 resetScreen()
@@ -71,7 +70,8 @@ while True:
     buttonvalue = ser.readline()
 
     print buttonvalue
-
+    
+    titleScreen("Temperatures")
     tempScreen1()
 
 
