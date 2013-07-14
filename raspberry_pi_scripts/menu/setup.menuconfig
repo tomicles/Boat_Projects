@@ -1,0 +1,29 @@
+[
+    {
+        display : Daemons,
+        action : {
+            type: subtree,
+            arg : daemons
+        }
+    },
+    {
+        display: USB Ports,
+        action : {
+            type: subtree,
+            arg: usb
+        }
+    },
+    {
+        display: Brightness,
+         action: {
+            type: subtree,
+            arg: brightness
+         }
+    }
+    {
+        display: Exit,
+        action: {
+            type: upone
+        }
+    }
+]
