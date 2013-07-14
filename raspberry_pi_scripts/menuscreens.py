@@ -149,27 +149,27 @@ class MenuScreens(object):
         ser.write(speed[:5])
     
 
-resetScreen()
-titleScreen("Temperatures")
-resetScreen()
-tempScreen1()
+MenuScreens.resetScreen()
+MenuScreens.titleScreen("Temperatures")
+MenuScreens.resetScreen()
+MenuScreens.tempScreen1()
 time.sleep(5)
 
-resetScreen()
-titleScreen("RawVoltage")
-voltageScreen1()
+MenuScreens.resetScreen()
+MenuScreens.titleScreen("RawVoltage")
+MenuScreens.voltageScreen1()
 time.sleep(5)
 
-resetScreen()
-titleScreen("Voltage")
-resetScreen()
-voltageScreen2()
+MenuScreens.resetScreen()
+MenuScreens.titleScreen("Voltage")
+MenuScreens.resetScreen()
+MenuScreens.voltageScreen2()
 time.sleep(5)
 
-resetScreen()
-titleScreen("Speed")
-resetScreen()
-speedScreen()
+MenuScreens.resetScreen()
+MenuScreens.titleScreen("Speed")
+MenuScreens.resetScreen()
+MenuScreens.speedScreen()
 time.sleep(5)
 
 
