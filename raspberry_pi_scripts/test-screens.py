@@ -27,7 +27,7 @@ def titleScreen(title):
 
  
 ############################################################
-#           tempScreen1()
+#       tempScreen1()
 #       Show raw temperatures
 #       | Temperatures    |
 #
@@ -59,21 +59,83 @@ def tempScreen1():
     ser.write(inside2temp[:5])
 
 
+############################################################
+#       voltageScreen1()
+#       Show raw voltages
+#       | Raw Voltage     |
+#
+#       | a0     : 0.0    |
+#       | a1     : 0.0    |  
+#       | a2 Amps: 2.11   |  
+#       | a3 Batt: 3.42   |  
+############################################################
+
+def voltageScreen1():
+    ser.write('a0     : ')
+    with open ("/var/tmp/data/voltage.raw.a0.out", "r") as myfile:
+        a0 = myfile.read()
+    ser.write(a0[:5])
+    ser.write('\x0D') # Carriage Return    
+    ser.write('a1     : ')
+    with open ("/var/tmp/data/voltage.raw.a1.out", "r") as myfile:
+        a1 = myfile.read()
+    ser.write(a1[:5])
+    ser.write('\x0D') # Carriage Return
+    ser.write('a2 Amps: ')
+    with open ("/var/tmp/data/voltage.raw.a2.out", "r") as myfile:
+        a2 = myfile.read()
+    ser.write(a2[:5])
+    ser.write('\x0D') # Carriage Return
+    ser.write('a3 Batt: ')
+    with open ("/var/tmp/data/voltage.raw.a3.out", "r") as myfile:
+        a3 = myfile.read()
+    ser.write(a3[:5])
 
 
-buttonvalue = 0
+############################################################
+#       voltageScreen2()
+#       Show voltages
+#       |     Voltage     |
+#
+#       | a0     : 0.0    |
+#       | a1     : 0.0    |  
+#       | a2 Amps: 2.11   |  
+#       | a3 Batt: 3.42   |  
+############################################################
+
+def voltageScreen1():
+    ser.write('a0     : ')
+    with open ("/var/tmp/data/voltage.multiplied.a0.out", "r") as myfile:
+        a0 = myfile.read()
+    ser.write(a0[:5])
+    ser.write('\x0D') # Carriage Return    
+    ser.write('a1     : ')
+    with open ("/var/tmp/data/voltage.multiplied.a1.out", "r") as myfile:
+        a1 = myfile.read()
+    ser.write(a1[:5])
+    ser.write('\x0D') # Carriage Return
+    ser.write('a2 Amps: ')
+    with open ("/var/tmp/data/voltage.multiplied.a2.out", "r") as myfile:
+        a2 = myfile.read()
+    ser.write(a2[:5])
+    ser.write('\x0D') # Carriage Return
+    ser.write('a3 Batt: ')
+    with open ("/var/tmp/data/voltage.multiplied.a3.out", "r") as myfile:
+        a3 = myfile.read()
+    ser.write(a3[:5])
 
 
 resetScreen()
+titleScreen("Temperatures")
+tempScreen1()
+time.sleep(5)
 
-while True:
-    buttonvalue = ser.readline()
+titleScreen("RawVoltage")
+voltageScreen1()
+time.sleep(5)
 
-    print buttonvalue
-    
-    titleScreen("Temperatures")
-    tempScreen1()
-
-
+titleScreen("Voltage")
+voltageScreen2()
+time.sleep(5)
 
 
