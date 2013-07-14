@@ -104,7 +104,7 @@ def voltageScreen1():
 #       | a3 Batt: 3.42   |  
 ############################################################
 
-def voltageScreen1():
+def voltageScreen2():
     ser.write('a0     : ')
     with open ("/var/tmp/data/voltage.multiplied.a0.out", "r") as myfile:
         a0 = myfile.read()
