@@ -52,7 +52,7 @@ def tempScreen1():
     ser.write('Outside: ')
     with open ("/var/tmp/data/temp.outside2.out", "r") as myfile:
         outside2temp = myfile.read()
-    ser.write(inside2temp[:5])
+    ser.write(outside2temp[:5])
     ser.write('\x0D') # Carriage Return
     ser.write('Inside : ')
     with open ("/var/tmp/data/temp.inside2.out", "r") as myfile:
