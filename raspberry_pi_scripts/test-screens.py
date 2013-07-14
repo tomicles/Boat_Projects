@@ -18,7 +18,7 @@ def resetScreen():
 def titleScreen(title):
     ser.write('\x01') # Home
     ser.write('\x03') # set font back to normal    
-    setFont(2)
+    setFont(1)
     ser.write(title)
     time.sleep(2)
     ser.write('\x01') # Home
