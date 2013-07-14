@@ -29,7 +29,7 @@ class MenuScreens(object):
         ser.write('\x0C') # clear screen     
 
 
-    
+
     ############################################################
     #       tempScreen1()
     #       Show raw temperatures
@@ -139,14 +139,17 @@ class MenuScreens(object):
     #
     #       | 11.23    |
     ############################################################
-    
+
     @staticmethod
     def speedScreen(ser):
         MenuScreens.setFont(4)
         with open ("/var/tmp/data/gps.speed.out", "r") as myfile:
             speed = myfile.read()
         ser.write(speed[:5])
-    
+
+    @staticmethod
+    def toScreen(string, ser):
+        pass #implement me
 
 if __name__ == '__main__':
     ser = serial.Serial('/dev/ttyACM1', 9600, timeout=0)

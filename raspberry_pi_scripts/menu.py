@@ -56,6 +56,6 @@ class Menu(object):
     def display(self):
         elem = self.find_current() 
         if elem.get('display_proc', False):
-            eval('MenuScreens.{method}'.format(method=elem.get('display_proc')))
+            eval('MenuScreens.{method}(self.ser)'.format(method=elem.get('display_proc')))
         else:
-            MenuScreens.toScreen(elem['display'])
+            MenuScreens.toScreen(elem['display'], self.ser)
