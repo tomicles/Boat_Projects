@@ -51,7 +51,7 @@ def read_from_port(ser, type):
             (status, val) = valid_sensor_data(buffer, __ranges.get(type))
             if valid(status):
                 with open("/var/tmp/data/water.{sensor}.out".format(sensor=value2), "w+") as f:
-                        f.write("{value}".format(val))
+                        f.write("{value}".format(value=val))
             buffer = ""
             time.sleep(10)
         else:
