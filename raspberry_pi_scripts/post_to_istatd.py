@@ -11,7 +11,7 @@ from daemon import Daemon
 from functools import partial
 
 def get_ip():
-    return  "192.168.24.129" 
+    return  "192.168.24.149" 
 
 def send_to_istatd(counter, data, sock, dest):
     sock.sendto("{counter} {data}\n".format(counter=counter, data=data), dest)
